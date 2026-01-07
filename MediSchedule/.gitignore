@@ -1,0 +1,78 @@
+# Visual Studio / .NET general
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+out/
+artifacts/
+
+# Rider
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# NuGet and packages
+*.nupkg
+packages/
+.nuget/
+project.lock.json
+
+# ASP.NET / Configuration / secrets
+appsettings.*.Local.json
+secrets.json
+.env
+
+# Database files (SQLite etc.)
+*.db
+*.sqlite
+*.sqlite3
+fleet.db
+
+# Publish folders
+publish/
+publish_output/
+
+# Test results / coverage
+TestResults/
+*.trx
+*.coverage
+coverage/
+coverage*.xml
+
+# Logs
+*.log
+logs/
+
+# Temporary / editor backup files
+*~
+*.swp
+*.swx
+*.tmp
+Thumbs.db
+.DS_Store
+
+# Generated files
+Generated/
+*.g.cs
+
+# Misc
+*.pid
+*.seed
+
+# Backup files created by Visual Studio or editors
+*.bak
+*.backup
+
+# MSBuild Files
+*.userprefs
+*.psess
+*.vsp
