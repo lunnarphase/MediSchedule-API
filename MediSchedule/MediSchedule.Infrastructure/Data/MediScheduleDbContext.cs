@@ -19,9 +19,14 @@ namespace MediSchedule.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Konfiguracja precyzji dla ceny poniewaz domyślnie EF może nie ustawić odpowiedniego typu w bazie danych
+            // Konfiguracja dla wizyty
             modelBuilder.Entity<Appointment>()
                 .Property(a => a.Price)
+                .HasColumnType("decimal(18,2)");
+
+            // Konfiguracja dla lekarza (stawka godzinowa)
+            modelBuilder.Entity<Doctor>()
+                .Property(d => d.BaseRate)
                 .HasColumnType("decimal(18,2)");
         }
     }
