@@ -1,8 +1,7 @@
 ﻿using MediSchedule.Application.DTOs;
+using MediSchedule.Application.Interfaces;
 using MediSchedule.Domain.Entities;
-using MediSchedule.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace MediSchedule.Api.Controllers
 {
@@ -10,23 +9,18 @@ namespace MediSchedule.Api.Controllers
     [ApiController]
     public class DoctorsController : ControllerBase
     {
-        private readonly MediScheduleDbContext _context;
+        private readonly IDoctorRepository _repository;
 
-        // Wstrzykiwanie DbContext przez konstruktor (Dependency Injection)
-        public DoctorsController(MediScheduleDbContext context)
+        public DoctorsController(IDoctorRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: api/doctors
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Doctor>>> GetDoctors()
         {
-            // Zwracamy tylko aktywnych lekarzy
-            var doctors = await _context.Doctors
-                .Where(d => d.IsActive)
-                .ToListAsync();
-
+            var doctors = await _repository.GetAllAsync();
             return Ok(doctors);
         }
 
@@ -34,8 +28,7 @@ namespace MediSchedule.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Doctor>> GetDoctor(int id)
         {
-            var doctor = await _context.Doctors.FindAsync(id);
-
+            var doctor = await _repository.GetByIdAsync(id);
             if (doctor == null || !doctor.IsActive)
             {
                 return NotFound();
@@ -48,7 +41,6 @@ namespace MediSchedule.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Doctor>> CreateDoctor(CreateDoctorDto dto)
         {
-            // Mapowanie DTO -> Encja
             var doctor = new Doctor
             {
                 FirstName = dto.FirstName,
@@ -58,10 +50,8 @@ namespace MediSchedule.Api.Controllers
                 IsActive = true
             };
 
-            _context.Doctors.Add(doctor);
-            await _context.SaveChangesAsync();
+            await _repository.AddAsync(doctor);
 
-            // Zwracamy 201 Created wraz z linkiem do nowego zasobu
             return CreatedAtAction(nameof(GetDoctor), new { id = doctor.Id }, doctor);
         }
 
@@ -69,17 +59,8 @@ namespace MediSchedule.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDoctor(int id)
         {
-            var doctor = await _context.Doctors.FindAsync(id);
-            if (doctor == null)
-            {
-                return NotFound();
-            }
-
-            // Soft Delete - nie usuwamy rekordu, tylko oznaczamy jako nieaktywny
-            doctor.IsActive = false;
-            await _context.SaveChangesAsync();
-
-            return NoContent(); // 204 No Content
+            await _repository.DeleteAsync(id);
+            return NoContent();
         }
     }
 }
