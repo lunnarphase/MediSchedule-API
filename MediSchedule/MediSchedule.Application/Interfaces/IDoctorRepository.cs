@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediSchedule.Domain.Entities;
+using System.Numerics;
 
 namespace MediSchedule.Application.Interfaces
 {
-    internal class IDoctorRepository
+    public interface IDoctorRepository
     {
+        Task<IEnumerable<Doctor>> GetAllAsync();
+        Task<Doctor?> GetByIdAsync(int id);
+        Task AddAsync(Doctor doctor);
+        Task UpdateAsync(Doctor doctor);
+        Task DeleteAsync(int id);
     }
 }

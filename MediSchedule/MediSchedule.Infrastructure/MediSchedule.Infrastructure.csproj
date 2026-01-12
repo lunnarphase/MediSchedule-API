@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MediSchedule.Application\MediSchedule.Application.csproj" />
     <ProjectReference Include="..\MediSchedule.Domain\MediSchedule.Domain.csproj" />
   </ItemGroup>
 

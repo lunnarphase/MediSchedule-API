@@ -1,10 +1,13 @@
+using MediSchedule.Application.Interfaces;
 using MediSchedule.Infrastructure.Data;
+using MediSchedule.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
