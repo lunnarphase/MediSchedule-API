@@ -15,12 +15,30 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// --- DATABASE CONFIGURATION ---
+// --- KONFIGURACJA BAZY DANYCH ---
 builder.Services.AddDbContext<MediScheduleDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // ------------------------------
 
 var app = builder.Build();
+
+// --- AUTOMATYCZNA MIGRACJA BAZY DANYCH ---
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<MediScheduleDbContext>();
+
+        context.Database.Migrate();
+        Console.WriteLine("Baza danych zosta³a pomyœlnie zmigrowana.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Wyst¹pi³ b³¹d podczas migracji bazy: {ex.Message}");
+    }
+}
+// -----------------------------------------
 
 if (app.Environment.IsDevelopment())
 {
