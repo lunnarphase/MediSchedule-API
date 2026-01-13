@@ -111,5 +111,37 @@ namespace MediSchedule.Api.Controllers
 
             return NoContent();
         }
+
+        // PUT: api/patients/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdatePatient(int id, UpdatePatientDto dto)
+        {
+            var patient = await _context.Patients.FindAsync(id);
+            if (patient == null || !patient.IsActive)
+            {
+                return NotFound();
+            }
+
+            // Walidacja: Jeśli PESEL się zmienił, sprawdź czy inny pacjent już go nie ma
+            if (dto.Pesel != patient.Pesel)
+            {
+                var peselExists = await _context.Patients.AnyAsync(p => p.Pesel == dto.Pesel && p.Id != id);
+                if (peselExists)
+                {
+                    return Conflict("Podany PESEL jest już przypisany do innego pacjenta.");
+                }
+            }
+
+            patient.FirstName = dto.FirstName;
+            patient.LastName = dto.LastName;
+            patient.Email = dto.Email;
+            patient.Pesel = dto.Pesel;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
     }
 }

@@ -10,5 +10,7 @@ namespace MediSchedule.Application.Interfaces
         Task<Appointment?> GetByIdAsync(int id);
         Task CancelAsync(int id);
         Task<IEnumerable<Appointment>> GetDoctorAppointmentsAsync(int doctorId, DateTime start, DateTime end);
+        Task<IEnumerable<Appointment>> GetAllAsync();
+
     }
 }

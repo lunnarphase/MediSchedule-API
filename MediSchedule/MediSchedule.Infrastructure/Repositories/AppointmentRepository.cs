@@ -57,5 +57,14 @@ namespace MediSchedule.Infrastructure.Repositories
                            a.StartTime.AddMinutes(a.DurationMinutes) > start)
                .ToListAsync();
         }
+
+        public async Task<IEnumerable<Appointment>> GetAllAsync()
+        {
+            return await _context.Appointments
+                .Include(a => a.Doctor)  // Dane lekarza
+                .Include(a => a.Patient) // Dane pacjenta
+                .OrderByDescending(a => a.StartTime) // Najnowsze na górze
+                .ToListAsync();
+        }
     }
 }

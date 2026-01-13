@@ -87,5 +87,27 @@ namespace MediSchedule.Api.Controllers
             await _appointmentRepository.CancelAsync(id);
             return NoContent();
         }
+
+        // GET: api/appointments
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetAllAppointments()
+        {
+            var appointments = await _appointmentRepository.GetAllAsync();
+
+            var dtos = appointments.Select(a => new AppointmentDto
+            {
+                Id = a.Id,
+                DoctorId = a.DoctorId,
+                DoctorName = $"{a.Doctor.FirstName} {a.Doctor.LastName}",
+                PatientId = a.PatientId,
+                PatientName = $"{a.Patient.FirstName} {a.Patient.LastName}",
+                StartTime = a.StartTime,
+                DurationMinutes = a.DurationMinutes,
+                Price = a.Price,
+                Status = a.Status.ToString()
+            });
+
+            return Ok(dtos);
+        }
     }
 }

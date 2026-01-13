@@ -62,5 +62,25 @@ namespace MediSchedule.Api.Controllers
             await _repository.DeleteAsync(id);
             return NoContent();
         }
+
+        // PUT: api/doctors/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateDoctor(int id, UpdateDoctorDto dto)
+        {
+            var doctor = await _repository.GetByIdAsync(id);
+            if (doctor == null || !doctor.IsActive)
+            {
+                return NotFound();
+            }
+
+            doctor.FirstName = dto.FirstName;
+            doctor.LastName = dto.LastName;
+            doctor.Specialization = dto.Specialization;
+            doctor.BaseRate = dto.BaseRate;
+
+            await _repository.UpdateAsync(doctor);
+
+            return NoContent();
+        }
     }
 }
