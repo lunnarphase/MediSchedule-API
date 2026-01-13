@@ -1,6 +1,6 @@
 ﻿using MediSchedule.Application.Interfaces;
 using MediSchedule.Domain.Entities;
-using MediSchedule.Domain.Enums; // Potrzebne do AppointmentStatus
+using MediSchedule.Domain.Enums;
 using MediSchedule.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +15,6 @@ namespace MediSchedule.Infrastructure.Repositories
             _context = context;
         }
 
-        // 1. Sprawdzanie kolizji
         public async Task<bool> HasOverlapAsync(int doctorId, DateTime startTime, DateTime endTime)
         {
             return await _context.Appointments
@@ -25,14 +24,12 @@ namespace MediSchedule.Infrastructure.Repositories
                                a.StartTime.AddMinutes(a.DurationMinutes) > startTime);
         }
 
-        // 2. Dodawanie wizyty
         public async Task AddAsync(Appointment appointment)
         {
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
         }
 
-        // 3. Pobieranie wizyty po ID
         public async Task<Appointment?> GetByIdAsync(int id)
         {
             return await _context.Appointments
@@ -41,7 +38,6 @@ namespace MediSchedule.Infrastructure.Repositories
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        // 4. Anulowanie wizyty 
         public async Task CancelAsync(int id)
         {
             var appointment = await _context.Appointments.FindAsync(id);
@@ -50,6 +46,17 @@ namespace MediSchedule.Infrastructure.Repositories
                 appointment.Status = AppointmentStatus.Canceled;
                 await _context.SaveChangesAsync();
             }
+        }
+
+        // --- IMPLEMENTACJA PRZYWRÓCONEJ METODY ---
+        public async Task<IEnumerable<Appointment>> GetDoctorAppointmentsAsync(int doctorId, DateTime start, DateTime end)
+        {
+            return await _context.Appointments
+               .Where(a => a.DoctorId == doctorId &&
+                           a.Status != AppointmentStatus.Canceled &&
+                           a.StartTime < end &&
+                           a.StartTime.AddMinutes(a.DurationMinutes) > start)
+               .ToListAsync();
         }
     }
 }
