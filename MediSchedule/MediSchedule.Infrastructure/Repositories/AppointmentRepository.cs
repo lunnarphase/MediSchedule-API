@@ -48,7 +48,6 @@ namespace MediSchedule.Infrastructure.Repositories
             }
         }
 
-        // --- IMPLEMENTACJA PRZYWRÓCONEJ METODY ---
         public async Task<IEnumerable<Appointment>> GetDoctorAppointmentsAsync(int doctorId, DateTime start, DateTime end)
         {
             return await _context.Appointments

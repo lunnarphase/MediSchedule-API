@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediSchedule", "MediSchedule\MediSchedule.vcxproj", "{CD5B1BAC-064B-4D63-B68B-D14DC0BE5FB0}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediSchedule.Infrastructure", "MediSchedule.Infrastructure\MediSchedule.Infrastructure.csproj", "{61C1069E-6D1F-487C-B776-7DB01DC7D446}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediSchedule.Api", "MediSchedule.Api\MediSchedule.Api.csproj", "{73B7FFA7-3ADB-4939-A95E-688F04669DC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediSchedule.Tests", "MediSchedule.Tests\MediSchedule.Tests.csproj", "{4281B42A-41FD-4A83-B0D3-9658401193F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,18 @@ Global
 		{73B7FFA7-3ADB-4939-A95E-688F04669DC0}.Release|x64.Build.0 = Release|Any CPU
 		{73B7FFA7-3ADB-4939-A95E-688F04669DC0}.Release|x86.ActiveCfg = Release|Any CPU
 		{73B7FFA7-3ADB-4939-A95E-688F04669DC0}.Release|x86.Build.0 = Release|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Debug|x64.Build.0 = Debug|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Debug|x86.Build.0 = Debug|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Release|x64.ActiveCfg = Release|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Release|x64.Build.0 = Release|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Release|x86.ActiveCfg = Release|Any CPU
+		{4281B42A-41FD-4A83-B0D3-9658401193F4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
