@@ -109,5 +109,23 @@ namespace MediSchedule.Api.Controllers
 
             return Ok(dtos);
         }
+
+        [HttpPut("{id}/complete")]
+        public async Task<IActionResult> CompleteAppointment(int id)
+        {
+            try
+            {
+                await _appointmentRepository.CompleteAsync(id);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
+        }
     }
 }

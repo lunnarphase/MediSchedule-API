@@ -66,5 +66,19 @@ namespace MediSchedule.Infrastructure.Repositories
                 .OrderByDescending(a => a.StartTime) // Najnowsze na górze
                 .ToListAsync();
         }
+
+        public async Task CompleteAsync(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment != null)
+            {
+                // Sprawdź czy nie jest już anulowana
+                if (appointment.Status == AppointmentStatus.Canceled)
+                    throw new InvalidOperationException("Nie można zakończyć anulowanej wizyty.");
+
+                appointment.Status = AppointmentStatus.Completed;
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

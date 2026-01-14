@@ -11,6 +11,7 @@ namespace MediSchedule.Application.Interfaces
         Task CancelAsync(int id);
         Task<IEnumerable<Appointment>> GetDoctorAppointmentsAsync(int doctorId, DateTime start, DateTime end);
         Task<IEnumerable<Appointment>> GetAllAsync();
+        Task CompleteAsync(int id);
 
     }
 }
