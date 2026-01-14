@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MediSchedule.Application\MediSchedule.Application.csproj" />
-    <ProjectReference Include="..\MediSchedule.Domain\MediSchedule.Domain.csproj" />
     <ProjectReference Include="..\MediSchedule.Infrastructure\MediSchedule.Infrastructure.csproj" />
   </ItemGroup>
 
