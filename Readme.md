@@ -107,8 +107,6 @@ Pełne zarządzanie kartotekami pacjentów i profilami lekarzy. Możliwość edy
 
 ---
 
-## 🔌 Pełna Lista API Endpoints
-
 ## 🔌 Pełna Lista Endpointów API
 
 | Kategoria | Metoda | Endpoint | Opis |
