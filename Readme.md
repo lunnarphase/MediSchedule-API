@@ -7,7 +7,7 @@
 ## 📋 Opis Projektu
 
 **MediSchedule API** to system klasy REST API służący do zarządzania placówką medyczną. 
-Projekt modeluje złożony problem harmonogramowania czasu pracy lekarzy różnych specjalizacji oraz umawiania wizyt pacjentów z uwzględnieniem reguł biznesowych (np. brak kolizji terminów, walidacja czasu trwania wizyty zależna od typu usługi).
+Projekt modeluje złożony problem harmonogramowania czasu pracy lekarzy różnych specjalizacji oraz umawiania wizyt pacjentów z uwzględnieniem reguł biznesowych (np. brak kolizji terminów, walidacja czasu trwania wizyty, weryfikacja godzin przyjęć lekarza).
 
 Głównym celem jest dostarczenie skalowalnego i czystego architektonicznie rozwiązania, które demonstruje separację logiki biznesowej od warstwy prezentacji i danych.
 
@@ -18,10 +18,10 @@ Głównym celem jest dostarczenie skalowalnego i czystego architektonicznie rozw
 * **Platforma:** .NET 8 (LTS)
 * **Framework:** ASP.NET Core Web API
 * **ORM:** Entity Framework Core (podejście Code-First)
-* **Baza danych:** SQL Server / PostgreSQL 
+* **Baza danych:** SQL Server (LocalDB)
 * **Dokumentacja API:** Swagger / OpenAPI
-* **Konteneryzacja:** Docker & Docker Compose
 * **Testy:** xUnit + Moq
+
 
 ---
 
@@ -30,14 +30,14 @@ Głównym celem jest dostarczenie skalowalnego i czystego architektonicznie rozw
 Projekt został zrealizowany zgodnie z zasadami **SOLID** oraz z wykorzystaniem wzorców projektowych adekwatnych do rozwiązywanych problemów.
 
 ### Zastosowane Wzorce:
-1. **Repository & Unit of Work**:
-   * *Cel:* Abstrakcja warstwy dostępu do danych. Kontrolery nie operują bezpośrednio na `DbContext`.
+1. **Repository Pattern**:
+   * *Cel:* Abstrakcja warstwy dostępu do danych. Kontrolery nie operują bezpośrednio na `DbContext`, lecz na interfejsach (np. `IAppointmentRepository`).
 2. **DTO (Data Transfer Object)**:
-   * *Cel:* Oddzielenie modelu domeny (Encji) od kontraktu API. Zapobiega over-postingowi i ukrywa wrażliwe dane.
-3. **Strategy Pattern** (Planowane):
-   * *Cel:* Obliczanie kosztu wizyty w zależności od specjalizacji lekarza i typu pacjenta (np. ubezpieczony/prywatny).
-4. **Dependency Injection**:
-   * *Cel:* Wstrzykiwanie zależności (Serwisy, Repozytoria) do Kontrolerów, co ułatwia testowanie i luźne powiązania.
+   * *Cel:* Oddzielenie modelu domeny (Encji) od kontraktu API. Zapobiega over-postingowi i ukrywa wrażliwe dane (np. struktura bazy).
+3. **Dependency Injection**:
+   * *Cel:* Wstrzykiwanie zależności (Serwisy, Repozytoria) do Kontrolerów, co ułatwia testowanie i zapewnia luźne powiązania (Loose Coupling).
+4. **Service Layer**:
+   * *Cel:* Wydzielenie logiki biznesowej (walidacja kolizji, godzin pracy, liczenie cen) do osobnych serwisów (`AppointmentService`), aby Kontrolery pozostały "lekkie".
 
 ---
 
@@ -53,6 +53,7 @@ classDiagram
         +string LastName
         +string Specialization
         +decimal BaseRate
+        +bool IsActive
         +ICollection~Schedule~ Schedules
     }
     class Patient {
@@ -61,26 +62,27 @@ classDiagram
         +string LastName
         +string Email
         +string Pesel
+        +bool IsActive
     }
- class Schedule {
+    class Schedule {
         +int Id
         +int DoctorId
         +DayOfWeek DayOfWeek
-        +TimeSpan StartTime  
-        +TimeSpan EndTime    
+        +TimeSpan StartTime
+        +TimeSpan EndTime
         +bool IsActive
     }
     class Appointment {
         +int Id
         +int DoctorId
         +int PatientId
-        +DateTime DateTime
+        +DateTime StartTime
         +int DurationMinutes
-        +string Status
+        +AppointmentStatus Status
         +decimal Price
     }
 
-    Doctor "1" -- "*" Schedule : defines
+    Doctor "1" -- "*" Schedule : has
     Doctor "1" -- "*" Appointment : conducts
     Patient "1" -- "*" Appointment : books
 ```
@@ -90,36 +92,54 @@ classDiagram
 ## 🚀 Funkcjonalności (Zakres .NET)
 
 ### 1. Zarządzanie Grafikami (Schedules)
-Lekarze definiują swoje godziny przyjęć. System pilnuje, aby wizyty były umawiane tylko w zdefiniowanych oknach czasowych.
+Lekarze definiują swoje godziny przyjęć (np. Poniedziałek 08:00-16:00). System pilnuje, aby wizyty były umawiane tylko w zdefiniowanych oknach czasowych.
 
 ### 2. Rezerwacja Wizyt (Appointments)
 * **Wykrywanie kolizji:** System blokuje próbę umówienia wizyty, jeśli lekarz ma już innego pacjenta w tym czasie.
-* **Walidacja reguł:** `AppointmentDate` musi zawierać się w `Schedule` lekarza.
+* **Walidacja godzin pracy** Nie można umówić wizyty poza grafikiem danego lekarza.
 * **Statusy:** Zarządzanie cyklem życia wizyty (`Scheduled`, `Completed`, `Canceled`).
 
 ### 3. Wyszukiwanie Dostępności
-Endpoint `GET /api/availability` zwracający wolne sloty czasowe dla wybranej specjalizacji w zadanym zakresie dat.
+Endpoint `GET /api/availability/check` zwracający wolne sloty czasowe dla wybranej specjalizacji w zadanym zakresie dat.
 
 ### 4. Pacjenci i Lekarze
-Pełny CRUD dla kartotek pacjentów i profili lekarzy (wraz ze specjalizacjami).
+Pełne zarządzanie kartotekami pacjentów i profilami lekarzy. Możliwość edycji danych (np. zmiana nazwiska, stawki godzinowej) oraz "miękkiego usuwania" (Soft Delete).
 
 ---
 
-## 🔌 API Endpoints (Przykłady)
+## 🔌 Pełna Lista API Endpoints
 
-| Metoda | Endpoint | Opis |
-| :--- | :--- | :--- |
-| `GET` | `/api/doctors?specialization=kardiolog` | Lista lekarzy (filtrowanie) |
-| `POST` | `/api/schedules` | Dodanie grafiku pracy lekarza |
-| `POST` | `/api/appointments` | Utworzenie nowej wizyty (rezerwacja) |
-| `DELETE`| `/api/appointments/{id}` | Odwołanie wizyty |
-| `GET` | `/api/availability?date=2024-01-20` | Pobranie wolnych terminów |
+## 🔌 Pełna Lista Endpointów API
+
+| Kategoria | Metoda | Endpoint | Opis |
+| :--- | :--- | :--- | :--- |
+| **Doctors** | `GET` | `/api/doctors` | Pobranie listy wszystkich lekarzy |
+| | `GET` | `/api/doctors/{id}` | Pobranie szczegółów konkretnego lekarza |
+| | `POST` | `/api/doctors` | Dodanie nowego lekarza |
+| | `PUT` | `/api/doctors/{id}` | Edycja danych lekarza (np. stawka, nazwisko) |
+| | `DELETE` | `/api/doctors/{id}` | Dezaktywacja lekarza (Soft Delete) |
+| **Patients** | `GET` | `/api/patients` | Pobranie listy wszystkich pacjentów |
+| | `GET` | `/api/patients/{id}` | Pobranie szczegółów pacjenta |
+| | `POST` | `/api/patients` | Rejestracja nowego pacjenta |
+| | `PUT` | `/api/patients/{id}` | Edycja danych pacjenta (np. PESEL, email) |
+| | `DELETE` | `/api/patients/{id}` | Dezaktywacja pacjenta |
+| **Schedules** | `POST` | `/api/schedules` | Dodanie godzin pracy dla lekarza (np. Pon 08:00-16:00) |
+| | `GET` | `/api/schedules/{doctorId}` | Pobranie grafiku pracy danego lekarza |
+| **Appointments** | `GET` | `/api/appointments` | Pobranie listy wszystkich wizyt (Admin View) |
+| | `GET` | `/api/appointments/{id}` | Pobranie szczegółów wizyty |
+| | `POST` | `/api/appointments` | Rezerwacja nowej wizyty (z walidacją kolizji i grafiku) |
+| | `PUT` | `/api/appointments/{id}/complete` | Oznaczenie wizyty jako "Zakończona" (Completed) |
+| | `DELETE` | `/api/appointments/{id}` | Anulowanie wizyty (Status Canceled) |
+| **Availability** | `GET` | `/api/availability/check` | Sprawdzenie czy dany termin jest wolny (True/False) |
+| | `GET` | `/api/availability/slots/{id}/{date}` | Pobranie zajętych slotów lekarza w danym dniu |
 
 ---
 
 ## 🧪 Testowanie
 
-Projekt zawiera zestaw testów jednostkowych weryfikujących kluczowe reguły biznesowe (np. nakładanie się wizyt).
-### Przykładowe scenariusze testowe:
-* Próba rezerwacji na zajęty termin
-* Weryfikacja logiki liczenia ceny wizyty
+Projekt zawiera zestaw testów jednostkowych (xUnit + Moq) weryfikujących kluczowe reguły biznesowe.
+### Scenariusze testowe:
+* Poprawność obliczania ceny wizyty na podstawie stawki lekarza i czasu trwania.
+* Blokowanie wizyty w przypadku nakładania się terminów (Overlap).
+* Obsługa wyjątków w przypadku braku lekarza.
+
