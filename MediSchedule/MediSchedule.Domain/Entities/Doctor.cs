@@ -6,11 +6,8 @@
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
         public string Specialization { get; set; } = default!;
-
-        // Stawka godzinowa / za wizytę
-        public decimal BaseRate { get; set; }
-
-        // Soft delete - zamiast usuwać z bazy, będziemy deaktywować
-        public bool IsActive { get; set; } = true;
+        public decimal BaseRate { get; set; }  // Stawka godzinowa / za wizytę
+        public bool IsActive { get; set; } = true;  // Soft delete - zamiast usuwać z bazy, będziemy deaktywować
+        public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
     }
 }
