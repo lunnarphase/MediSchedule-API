@@ -62,12 +62,12 @@ classDiagram
         +string Email
         +string Pesel
     }
-    class Schedule {
+ class Schedule {
         +int Id
         +int DoctorId
         +DayOfWeek DayOfWeek
-        +TimeOnly StartTime
-        +TimeOnly EndTime
+        +TimeSpan StartTime  
+        +TimeSpan EndTime    
         +bool IsActive
     }
     class Appointment {
