@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public int DoctorId { get; set; }
-        public string DoctorName { get; set; } = default!; 
+        public string DoctorName { get; set; } = default!; // "= default!;" Ignoruje ostrzeżenie kompilatora o możliwym nullu przy mapowaniu z encji
         public int PatientId { get; set; }
         public string PatientName { get; set; } = default!;
 
