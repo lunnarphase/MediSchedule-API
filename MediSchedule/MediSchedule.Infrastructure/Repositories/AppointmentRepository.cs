@@ -15,6 +15,9 @@ namespace MediSchedule.Infrastructure.Repositories
             _context = context;
         }
 
+
+        // Zapytanie LINQ sprawdzające nakładanie się wizyt dla danego lekarza i przedziału czasowego
+        // Następnie Entity Framework przetłumaczy to na odpowiednie zapytanie SQL do bazy danych i wykona je asynchronicznie
         public async Task<bool> HasOverlapAsync(int doctorId, DateTime startTime, DateTime endTime)
         {
             return await _context.Appointments

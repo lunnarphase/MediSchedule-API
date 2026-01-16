@@ -31,7 +31,7 @@ namespace MediSchedule.Tests
         [Fact]
         public async Task ScheduleAppointmentAsync_ShouldCalculatePriceCorrectly()
         {
-            // Arrange
+            // Test sprawdzajacy czy metoda ScheduleAppointmentAsync poprawnie oblicza cene wizyty na podstawie stawki bazowej lekarza i czasu trwania wizyty
             var dto = new CreateAppointmentDto { DoctorId = 1, PatientId = 1, StartTime = new DateTime(2024, 6, 10, 10, 0, 0), DurationMinutes = 30 };
             var doctor = new Doctor { Id = 1, BaseRate = 200, IsActive = true };
             var schedule = new Schedule { StartTime = new TimeSpan(8, 0, 0), EndTime = new TimeSpan(16, 0, 0), DayOfWeek = DayOfWeek.Monday };

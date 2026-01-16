@@ -1,7 +1,7 @@
-﻿using MediSchedule.Application.DTOs;
-using MediSchedule.Application.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
+using MediSchedule.Application.DTOs;
+using MediSchedule.Application.Interfaces; // <-- TO JEST KLUCZOWE
 using MediSchedule.Application.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MediSchedule.Api.Controllers
 {
@@ -11,11 +11,19 @@ namespace MediSchedule.Api.Controllers
     {
         private readonly IAppointmentService _appointmentService;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IDoctorRepository _doctorRepository;
+        private readonly IPatientRepository _patientRepository;
 
-        public AppointmentsController(IAppointmentService appointmentService, IAppointmentRepository appointmentRepository)
+        public AppointmentsController(
+            IAppointmentService appointmentService,
+            IAppointmentRepository appointmentRepository,
+            IDoctorRepository doctorRepository,
+            IPatientRepository patientRepository)
         {
             _appointmentService = appointmentService;
             _appointmentRepository = appointmentRepository;
+            _doctorRepository = doctorRepository;
+            _patientRepository = patientRepository;
         }
 
         // POST: api/appointments
@@ -24,17 +32,19 @@ namespace MediSchedule.Api.Controllers
         {
             try
             {
-                
                 var appointment = await _appointmentService.ScheduleAppointmentAsync(dto);
 
-                // Mapowanie Encja -> DTO 
+                // Pobieramy dane, żeby ładnie wyświetlić nazwiska
+                var doctor = await _doctorRepository.GetByIdAsync(appointment.DoctorId);
+                var patient = await _patientRepository.GetByIdAsync(appointment.PatientId);
+
                 var resultDto = new AppointmentDto
                 {
                     Id = appointment.Id,
                     DoctorId = appointment.DoctorId,
-                    DoctorName = "Sprawdź GETem", // Debug info
+                    DoctorName = doctor != null ? $"{doctor.FirstName} {doctor.LastName}" : "Unknown",
                     PatientId = appointment.PatientId,
-                    PatientName = "Sprawdź GETem",
+                    PatientName = patient != null ? $"{patient.FirstName} {patient.LastName}" : "Unknown",
                     StartTime = appointment.StartTime,
                     DurationMinutes = appointment.DurationMinutes,
                     Price = appointment.Price,
@@ -43,11 +53,11 @@ namespace MediSchedule.Api.Controllers
 
                 return CreatedAtAction(nameof(GetAppointment), new { id = appointment.Id }, resultDto);
             }
-            catch (InvalidOperationException ex) // Np. kolizja terminów
+            catch (InvalidOperationException ex)
             {
                 return Conflict(new { message = ex.Message });
             }
-            catch (Exception ex) // Np. brak lekarza
+            catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
@@ -64,68 +74,78 @@ namespace MediSchedule.Api.Controllers
                 return NotFound();
             }
 
+            var doctor = await _doctorRepository.GetByIdAsync(appointment.DoctorId);
+            var patient = await _patientRepository.GetByIdAsync(appointment.PatientId);
+
             var dto = new AppointmentDto
             {
                 Id = appointment.Id,
                 DoctorId = appointment.DoctorId,
-                DoctorName = $"{appointment.Doctor.FirstName} {appointment.Doctor.LastName}",
+                DoctorName = doctor != null ? $"{doctor.FirstName} {doctor.LastName}" : "Unknown",
                 PatientId = appointment.PatientId,
-                PatientName = $"{appointment.Patient.FirstName} {appointment.Patient.LastName}",
+                PatientName = patient != null ? $"{patient.FirstName} {patient.LastName}" : "Unknown",
                 StartTime = appointment.StartTime,
                 DurationMinutes = appointment.DurationMinutes,
                 Price = appointment.Price,
                 Status = appointment.Status.ToString()
             };
 
-            return Ok(dto);
-        }
-
-        // DELETE: api/appointments/5 (Anulowanie)
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> CancelAppointment(int id)
-        {
-            await _appointmentRepository.CancelAsync(id);
-            return NoContent();
+            return dto;
         }
 
         // GET: api/appointments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetAllAppointments()
+        public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetAppointments()
         {
             var appointments = await _appointmentRepository.GetAllAsync();
+            var dtos = new List<AppointmentDto>();
 
-            var dtos = appointments.Select(a => new AppointmentDto
+            foreach (var app in appointments)
             {
-                Id = a.Id,
-                DoctorId = a.DoctorId,
-                DoctorName = $"{a.Doctor.FirstName} {a.Doctor.LastName}",
-                PatientId = a.PatientId,
-                PatientName = $"{a.Patient.FirstName} {a.Patient.LastName}",
-                StartTime = a.StartTime,
-                DurationMinutes = a.DurationMinutes,
-                Price = a.Price,
-                Status = a.Status.ToString()
-            });
+                var doctor = await _doctorRepository.GetByIdAsync(app.DoctorId);
+                var patient = await _patientRepository.GetByIdAsync(app.PatientId);
+
+                dtos.Add(new AppointmentDto
+                {
+                    Id = app.Id,
+                    DoctorId = app.DoctorId,
+                    DoctorName = doctor != null ? $"{doctor.FirstName} {doctor.LastName}" : "Unknown",
+                    PatientId = app.PatientId,
+                    PatientName = patient != null ? $"{patient.FirstName} {patient.LastName}" : "Unknown",
+                    StartTime = app.StartTime,
+                    DurationMinutes = app.DurationMinutes,
+                    Price = app.Price,
+                    Status = app.Status.ToString()
+                });
+            }
 
             return Ok(dtos);
         }
 
-        [HttpPut("{id}/complete")]
-        public async Task<IActionResult> CompleteAppointment(int id)
+        // DELETE: api/appointments/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAppointment(int id)
         {
             try
             {
-                await _appointmentRepository.CompleteAsync(id);
+                await _appointmentRepository.CancelAsync(id);
                 return NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
             }
             catch (Exception)
             {
                 return NotFound();
             }
+        }
+
+        // PUT: api/appointments/5/complete
+        [HttpPut("{id}/complete")]
+        public async Task<IActionResult> CompleteAppointment(int id)
+        {
+            var appointment = await _appointmentRepository.GetByIdAsync(id);
+            if (appointment == null) return NotFound();
+
+            await _appointmentRepository.CompleteAsync(id);
+            return NoContent();
         }
     }
 }

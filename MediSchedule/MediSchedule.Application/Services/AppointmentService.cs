@@ -30,6 +30,7 @@ namespace MediSchedule.Application.Services
             var dayOfWeek = dto.StartTime.DayOfWeek;
             var schedule = await _scheduleRepository.GetDoctorScheduleForDayAsync(dto.DoctorId, dayOfWeek);
 
+            // Jeśli brak grafiku na ten dzień, lekarz nie przyjmuje
             if (schedule == null)
                 throw new InvalidOperationException($"Lekarz nie przyjmuje w dniu: {dayOfWeek}");
 
@@ -41,14 +42,17 @@ namespace MediSchedule.Application.Services
             var workStart = TimeOnly.FromTimeSpan(schedule.StartTime);
             var workEnd = TimeOnly.FromTimeSpan(schedule.EndTime);
 
+            // Sprawdź czy wizyta mieści się w godzinach pracy
             if (appointmentStart < workStart || appointmentEnd > workEnd)
                 throw new InvalidOperationException($"Wizyta poza godzinami pracy lekarza ({workStart}-{workEnd}).");
 
+            // Sprawdź kolizje z innymi wizytami
             var endTime = dto.StartTime.AddMinutes(dto.DurationMinutes);
             var hasOverlap = await _appointmentRepository.HasOverlapAsync(dto.DoctorId, dto.StartTime, endTime);
             if (hasOverlap)
                 throw new InvalidOperationException("Termin jest już zajęty przez inną wizytę.");
 
+            // Oblicz cenę na podstawie stawki godzinowej lekarza
             decimal price = doctor.BaseRate * (dto.DurationMinutes / 60.0m);
 
             var appointment = new Appointment

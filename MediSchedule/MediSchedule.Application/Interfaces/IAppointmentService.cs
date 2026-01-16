@@ -1,7 +1,7 @@
 ﻿using MediSchedule.Application.DTOs;
 using MediSchedule.Domain.Entities;
 
-namespace MediSchedule.Application.Services
+namespace MediSchedule.Application.Interfaces
 {
     public interface IAppointmentService
     {
