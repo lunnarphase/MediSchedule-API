@@ -38,6 +38,7 @@ namespace MediSchedule.Api.Controllers
                 var doctor = await _doctorRepository.GetByIdAsync(appointment.DoctorId);
                 var patient = await _patientRepository.GetByIdAsync(appointment.PatientId);
 
+                // Mapowanie encji domenowej () na obiekt DTO w celu ukrycia szczegółów wewnętrznej implementacji 
                 var resultDto = new AppointmentDto
                 {
                     Id = appointment.Id,

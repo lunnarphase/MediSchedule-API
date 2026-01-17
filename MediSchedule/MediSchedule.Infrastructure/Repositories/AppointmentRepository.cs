@@ -15,9 +15,12 @@ namespace MediSchedule.Infrastructure.Repositories
             _context = context;
         }
 
-
-        // Zapytanie LINQ sprawdzające nakładanie się wizyt dla danego lekarza i przedziału czasowego
-        // Następnie Entity Framework przetłumaczy to na odpowiednie zapytanie SQL do bazy danych i wykona je asynchronicznie
+        // --- Algorytm wykryający nakładanie się wizyt ---
+        // Zapytanie LINQ sprawdza w bazie danych, czy istnieje (.AnyAsync) jakakolwiek wizyta tego lekarza, która:
+        // 1. Nie jest anulowana (Status != Canceled)
+        // 2. Jej czas trwania "zachodzi" na czas nowej wizyty.
+        // Logika matematyczna kolizji: (Start A < Koniec B) ORAZ (Koniec A > Start B)
+        // Jeśli ten warunek jest spełniony, oznacza to, że przedziały czasowe się pokrywają.
         public async Task<bool> HasOverlapAsync(int doctorId, DateTime startTime, DateTime endTime)
         {
             return await _context.Appointments

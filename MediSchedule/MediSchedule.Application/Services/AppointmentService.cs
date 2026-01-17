@@ -22,7 +22,7 @@ namespace MediSchedule.Application.Services
 
         public async Task<Appointment> ScheduleAppointmentAsync(CreateAppointmentDto dto)
         {
-            var doctor = await _doctorRepository.GetByIdAsync(dto.DoctorId);
+            var doctor = await _doctorRepository.GetByIdAsync(dto.DoctorId); // Pobieramy encję lekarza z repozytorium na podstawie ID
             if (doctor == null || !doctor.IsActive)
                 throw new Exception("Lekarz nie istnieje lub jest nieaktywny.");
 
@@ -30,7 +30,7 @@ namespace MediSchedule.Application.Services
             var dayOfWeek = dto.StartTime.DayOfWeek;
             var schedule = await _scheduleRepository.GetDoctorScheduleForDayAsync(dto.DoctorId, dayOfWeek);
 
-            // Jeśli brak grafiku na ten dzień, lekarz nie przyjmuje
+            // Weryfikujemy dostępność zasobu sprawdzając, czy istnieje grafik dla danego dnia tygodnia
             if (schedule == null)
                 throw new InvalidOperationException($"Lekarz nie przyjmuje w dniu: {dayOfWeek}");
 
@@ -46,13 +46,13 @@ namespace MediSchedule.Application.Services
             if (appointmentStart < workStart || appointmentEnd > workEnd)
                 throw new InvalidOperationException($"Wizyta poza godzinami pracy lekarza ({workStart}-{workEnd}).");
 
-            // Sprawdź kolizje z innymi wizytami
+            // Złożony problem -> Algorytm sprawdzający kolizje terminów wizyt "HasOverlapAsync"
             var endTime = dto.StartTime.AddMinutes(dto.DurationMinutes);
             var hasOverlap = await _appointmentRepository.HasOverlapAsync(dto.DoctorId, dto.StartTime, endTime);
             if (hasOverlap)
                 throw new InvalidOperationException("Termin jest już zajęty przez inną wizytę.");
 
-            // Oblicz cenę na podstawie stawki godzinowej lekarza
+            // Oblicz cenę wizyty dla pacjenta na podstawie stawki godzinowej lekarza
             decimal price = doctor.BaseRate * (dto.DurationMinutes / 60.0m);
 
             var appointment = new Appointment
@@ -65,9 +65,9 @@ namespace MediSchedule.Application.Services
                 Status = Domain.Enums.AppointmentStatus.Scheduled
             };
 
-            await _appointmentRepository.AddAsync(appointment);
+            await _appointmentRepository.AddAsync(appointment); // Zapisujemy nową wizytę w repozytorium
 
-            return appointment;
+            return appointment; // Zwracamy nowo utworzoną encję wizyty
         }
     }
 }
