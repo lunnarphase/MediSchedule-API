@@ -6,14 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddControllers();
 
+// --- REJESTRACJA SERWISÓW (DEPENDENCY INJECTION) ---
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
-builder.Services.AddScoped<IAppointmentService, AppointmentService>();
-builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IPatientRepository, PatientRepository>(); // <-- DODA£EM TO (Naprawia b³¹d)
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+// ---------------------------------------------------
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -35,11 +37,11 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<MediScheduleDbContext>();
 
         context.Database.Migrate();
-        Console.WriteLine("Baza danych zosta³a pomyœlnie zmigrowana.");
+        Console.WriteLine("Baza danych zostaa pomylnie zmigrowana.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Wyst¹pi³ b³¹d podczas migracji bazy: {ex.Message}");
+        Console.WriteLine($"Wystpi bd podczas migracji bazy: {ex.Message}");
     }
 }
 // -----------------------------------------

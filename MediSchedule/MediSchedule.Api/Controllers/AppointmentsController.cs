@@ -34,7 +34,7 @@ namespace MediSchedule.Api.Controllers
             {
                 var appointment = await _appointmentService.ScheduleAppointmentAsync(dto);
 
-                // Pobieramy dane, żeby ładnie wyświetlić nazwiska
+                // Pobieramy dane, aby wyświetlić nazwiska
                 var doctor = await _doctorRepository.GetByIdAsync(appointment.DoctorId);
                 var patient = await _patientRepository.GetByIdAsync(appointment.PatientId);
 

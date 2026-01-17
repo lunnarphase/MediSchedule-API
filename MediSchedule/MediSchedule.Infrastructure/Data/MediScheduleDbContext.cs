@@ -5,7 +5,7 @@ namespace MediSchedule.Infrastructure.Data
 {
     public class MediScheduleDbContext : DbContext
     {
-        // Konstruktor przyjmujący opcje (np. connection string)
+        // Konstruktor przyjmujący opcje
         public MediScheduleDbContext(DbContextOptions<MediScheduleDbContext> options) : base(options)
         {
         }
