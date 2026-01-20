@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MediSchedule.Application.DTOs;
-using MediSchedule.Application.Interfaces; // <-- TO JEST KLUCZOWE
+using MediSchedule.Application.Interfaces; 
 using MediSchedule.Application.Services;
 
 namespace MediSchedule.Api.Controllers
@@ -14,8 +14,8 @@ namespace MediSchedule.Api.Controllers
         private readonly IDoctorRepository _doctorRepository;
         private readonly IPatientRepository _patientRepository;
 
-        public AppointmentsController(
-            IAppointmentService appointmentService,
+        public AppointmentsController( 
+            IAppointmentService appointmentService, 
             IAppointmentRepository appointmentRepository,
             IDoctorRepository doctorRepository,
             IPatientRepository patientRepository)
