@@ -1,0 +1,16 @@
+**/target/
+**/node_modules/
+**/dist/
+**/.vs/
+**/bin/
+**/obj/
+**/x64/
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+*.log
+*.user
+*.suo
+test-results/
