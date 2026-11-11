@@ -28,5 +28,10 @@ services:
       retries: 20
     depends_on:
       db: {condition: service_healthy}
+  frontend:
+    build: ./frontend
+    ports: ["127.0.0.1:${FRONTEND_PORT:-8088}:80"]
+    depends_on:
+      backend: {condition: service_healthy}
 volumes:
   pgdata:
