@@ -13,6 +13,8 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+  flyway:
+    enabled: true
 server:
   port: ${PORT:8080}
   error:
