@@ -19,6 +19,7 @@ services:
       DATABASE_URL: jdbc:postgresql://db:5432/medischedule
       DB_USER: ${DB_USER:-medischedule}
       DB_PASSWORD: ${DB_PASSWORD:?Ustaw DB_PASSWORD w pliku .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     ports: ["127.0.0.1:${BACKEND_PORT:-8081}:8080"]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
