@@ -138,7 +138,8 @@ public class DoctorService {
     Doctor d = doctors.lockById(mine().id).orElseThrow();
     if (ranges == null || ranges.size() > 300) throw new ApiException(400, "Nieprawidłowy grafik.");
     for (Range r : ranges) {
-      if (r.date == null
+      if (r == null
+          || r.date == null
           || r.startTime == null
           || r.endTime == null
           || r.date.isBefore(from)
