@@ -8,8 +8,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,5 +175,52 @@ abstract class ApiIntegrationTestSupport {
     int sum = 0;
     for (int i = 0; i < 10; i++) sum += (ten.charAt(i) - '0') * weights[i];
     return ten + (10 - sum % 10) % 10;
+  }
+
+  long book(MockHttpSession session, String time) throws Exception {
+    return body(requestBooking(session, doctorId, time).andExpect(status().isCreated()).andReturn())
+        .get("id")
+        .asLong();
+  }
+
+  ResultActions requestBooking(MockHttpSession session, long selectedDoctor, String time)
+      throws Exception {
+    return mvc.perform(
+        post("/api/appointments")
+            .session(session)
+            .with(csrf())
+            .contentType("application/json")
+            .content(
+                json.writeValueAsString(
+                    Map.of("doctorId", selectedDoctor, "date", day.toString(), "time", time))));
+  }
+
+  void complete(long id) throws Exception {
+    mvc.perform(
+            patch("/api/appointments/{id}/status", id)
+                .session(doctor)
+                .with(csrf())
+                .contentType("application/json")
+                .content("{\"status\":\"completed\",\"recommendations\":\"Kontrola za miesiąc.\"}"))
+        .andExpect(status().isOk());
+  }
+
+  List<Integer> race(Callable<Integer> first, Callable<Integer> second) throws Exception {
+    var gate = new CountDownLatch(1);
+    var pool = Executors.newFixedThreadPool(2);
+    try {
+      var a = pool.submit(() -> afterGate(gate, first));
+      var b = pool.submit(() -> afterGate(gate, second));
+      gate.countDown();
+      return List.of(a.get(20, TimeUnit.SECONDS), b.get(20, TimeUnit.SECONDS));
+    } finally {
+      pool.shutdownNow();
+    }
+  }
+
+  private int afterGate(CountDownLatch gate, Callable<Integer> task) throws Exception {
+    if (!gate.await(10, TimeUnit.SECONDS))
+      throw new IllegalStateException("Przekroczono czas oczekiwania");
+    return task.call();
   }
 }
