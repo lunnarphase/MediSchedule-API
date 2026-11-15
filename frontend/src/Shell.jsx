@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { AppContext, Brand, Confirm, Icon } from "./components";
 import { Profile } from "./features/Profile";
+import { Doctors } from "./features/patient/Doctors";
 
-const patientMenu = [];
+const patientMenu = [["doctors", "Nasi specjaliści", "users"]];
 const roles = { patient: "Pacjent", doctor: "Lekarz", admin: "Administrator" };
 
 function defaultRoute(role) {
-  return role === "patient" ? "profile" : "profile";
+  return role === "patient" ? "doctors" : "profile";
 }
 
 function readRoute(role) {
@@ -43,6 +44,7 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
   };
   const views = {
     profile: <Profile />,
+    ...(user.role === "patient" ? { doctors: <Doctors /> } : {}),
   };
   const items = user.role === "patient" ? patientMenu : [];
 
