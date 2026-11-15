@@ -56,7 +56,7 @@ export function DoctorCard({ doctor, onSelect, compact = false }) {
 }
 
 export function DoctorModal({ doctor, onClose }) {
-  const { notify, changed } = useApp();
+  const { notify, changed, navigate } = useApp();
   const detail = useData(`/doctors/${doctor.id}`),
     dates = useData(
       `/doctors/${doctor.id}/available-dates?from=${localDate()}&to=${addDays(localDate(), 60)}`,
@@ -105,6 +105,7 @@ export function DoctorModal({ doctor, onClose }) {
       notify("Wizyta została zarezerwowana.");
       changed();
       onClose();
+      navigate("appointments");
     });
   }
   return (

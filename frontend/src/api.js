@@ -127,3 +127,10 @@ export const money = (value) =>
 export function validPhone(value) {
   return /^[+0-9 ()-]*$/.test(value || "");
 }
+
+export function isUpcoming(appointment, now = new Date()) {
+  return (
+    appointment.status === "confirmed" &&
+    new Date(`${appointment.date}T${appointment.time}`) > now
+  );
+}

@@ -2,12 +2,18 @@ import { useEffect, useState } from "react";
 import { AppContext, Brand, Confirm, Icon } from "./components";
 import { Profile } from "./features/Profile";
 import { Doctors } from "./features/patient/Doctors";
+import { PatientDashboard } from "./features/patient/Dashboard";
+import { Appointments } from "./features/patient/Appointments";
 
-const patientMenu = [["doctors", "Nasi specjaliści", "users"]];
+const patientMenu = [
+  ["home", "Strona główna", "chart"],
+  ["appointments", "Moje wizyty", "calendar"],
+  ["doctors", "Nasi specjaliści", "users"],
+];
 const roles = { patient: "Pacjent", doctor: "Lekarz", admin: "Administrator" };
 
 function defaultRoute(role) {
-  return role === "patient" ? "doctors" : "profile";
+  return role === "patient" ? "home" : "profile";
 }
 
 function readRoute(role) {
@@ -45,6 +51,9 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
   const views = {
     profile: <Profile />,
     ...(user.role === "patient" ? { doctors: <Doctors /> } : {}),
+    ...(user.role === "patient"
+      ? { home: <PatientDashboard />, appointments: <Appointments /> }
+      : {}),
   };
   const items = user.role === "patient" ? patientMenu : [];
 
