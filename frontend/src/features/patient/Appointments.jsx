@@ -5,6 +5,7 @@ import {
   Button,
   Empty,
   ErrorBox,
+  Icon,
   Loading,
   Modal,
   PageHeading,
@@ -13,6 +14,7 @@ import {
   useApp,
   useMutation,
 } from "../../components";
+import { ReviewModal } from "./Reviews";
 
 export function Appointments() {
   const state = useData("/appointments", []);
@@ -127,6 +129,22 @@ export function AppointmentList({ appointments }) {
                         Anuluj wizytę
                       </Button>
                     )}
+                    {a.status === "completed" && !a.reviewSubmitted && (
+                      <Button
+                        variant="review"
+                        onClick={() =>
+                          setAction({ type: "review", appointment: a })
+                        }
+                      >
+                        <Icon name="star" size={16} />
+                        Wystaw opinię
+                      </Button>
+                    )}
+                    {a.reviewSubmitted && (
+                      <span className="small-copy muted">
+                        <Icon name="check" size={14} /> Opinia wystawiona
+                      </span>
+                    )}
                   </div>
                 </article>
               ))}
@@ -136,6 +154,12 @@ export function AppointmentList({ appointments }) {
       </div>
       {action?.type === "cancel" && (
         <CancelModal
+          appointment={action.appointment}
+          onClose={() => setAction(null)}
+        />
+      )}{" "}
+      {action?.type === "review" && (
+        <ReviewModal
           appointment={action.appointment}
           onClose={() => setAction(null)}
         />

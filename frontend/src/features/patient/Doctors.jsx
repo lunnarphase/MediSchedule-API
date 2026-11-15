@@ -102,7 +102,9 @@ export function DoctorModal({ doctor, onClose }) {
         }
         throw error;
       }
-      notify("Wizyta została zarezerwowana.");
+      notify(
+        "Wizyta została zarezerwowana. Potwierdzenie znajdziesz w powiadomieniach.",
+      );
       changed();
       onClose();
       navigate("appointments");

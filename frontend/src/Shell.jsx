@@ -4,6 +4,8 @@ import { Profile } from "./features/Profile";
 import { Doctors } from "./features/patient/Doctors";
 import { PatientDashboard } from "./features/patient/Dashboard";
 import { Appointments } from "./features/patient/Appointments";
+import { useData } from "./api";
+import { Notifications } from "./features/Notifications";
 
 const patientMenu = [
   ["home", "Strona główna", "chart"],
@@ -20,6 +22,7 @@ function readRoute(role) {
   const route = location.hash.replace(/^#\/?/, "");
   const allowed = [
     "profile",
+    "notifications",
     ...(role === "patient" ? patientMenu.map(([key]) => key) : []),
   ];
   return allowed.includes(route) ? route : defaultRoute(role);
@@ -29,6 +32,10 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
   const [route, setRoute] = useState(() => readRoute(user.role));
   const [mobile, setMobile] = useState(false);
   const [logout, setLogout] = useState(false);
+  const notifications = useData("/notifications", []);
+  const unread = (notifications.data || []).filter(
+    (notice) => !notice.read,
+  ).length;
 
   useEffect(() => {
     const syncRoute = () => {
@@ -54,6 +61,7 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
     ...(user.role === "patient"
       ? { home: <PatientDashboard />, appointments: <Appointments /> }
       : {}),
+    notifications: <Notifications />,
   };
   const items = user.role === "patient" ? patientMenu : [];
 
@@ -104,6 +112,18 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
             </button>
           </nav>
           <div className="header-actions">
+            <button
+              className={`icon-button notification-button ${route === "notifications" ? "active" : ""}`}
+              onClick={() => navigate("notifications")}
+              aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ""}`}
+            >
+              <Icon name="bell" />
+              {unread > 0 && (
+                <span className="unread-count">
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              )}
+            </button>
             <button
               className="header-user"
               onClick={() => navigate("profile")}

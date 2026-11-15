@@ -197,6 +197,9 @@ export function DataState({ state, children, empty = "Brak danych" }) {
     return <Empty title={empty} />;
   return children(state.data);
 }
+const modalStack = [];
+let modalBodyOverflow = "";
+
 export function Modal({ title, children, onClose, wide = false }) {
   const titleId = useId();
   const ref = useRef(null);
@@ -204,7 +207,9 @@ export function Modal({ title, children, onClose, wide = false }) {
   closeRef.current = onClose;
   useEffect(() => {
     const previous = document.activeElement;
-    const old = document.body.style.overflow;
+    const panel = ref.current;
+    if (!modalStack.length) modalBodyOverflow = document.body.style.overflow;
+    modalStack.push(panel);
     document.body.style.overflow = "hidden";
     const focusables = () =>
       [
@@ -214,6 +219,7 @@ export function Modal({ title, children, onClose, wide = false }) {
       ].filter((el) => el.offsetParent !== null);
     focusables()[0]?.focus();
     const key = (e) => {
+      if (modalStack.at(-1) !== panel) return;
       if (e.key === "Escape") closeRef.current();
       if (e.key === "Tab") {
         const list = focusables(),
@@ -231,9 +237,11 @@ export function Modal({ title, children, onClose, wide = false }) {
     };
     document.addEventListener("keydown", key);
     return () => {
-      document.body.style.overflow = old;
+      const index = modalStack.indexOf(panel);
+      if (index >= 0) modalStack.splice(index, 1);
+      if (!modalStack.length) document.body.style.overflow = modalBodyOverflow;
       document.removeEventListener("keydown", key);
-      previous?.focus();
+      if (previous?.isConnected) previous.focus();
     };
   }, []);
   return createPortal(
