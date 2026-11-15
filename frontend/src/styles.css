@@ -109,6 +109,10 @@ code {
   color: var(--muted);
 }
 
+.section-copy {
+  margin-bottom: 24px !important;
+}
+
 .full-width {
   width: 100%;
 }
@@ -224,6 +228,13 @@ code {
   margin-bottom: 24px;
 }
 
+.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  align-items: start;
+}
+
 .btn {
   border: 1px solid transparent;
   display: inline-flex;
@@ -291,6 +302,12 @@ code {
 
 .btn-review:hover:not(:disabled) {
   background: #fff0c9;
+}
+
+.button-arrow {
+  font-size: 19px;
+  line-height: 1;
+  margin-left: 8px;
 }
 
 .text-button {
@@ -401,6 +418,12 @@ code {
 .field input::placeholder,
 .field textarea::placeholder {
   color: #97a3ad;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 17px;
 }
 
 .form-actions {
@@ -668,6 +691,12 @@ code {
   flex-shrink: 0;
 }
 
+.avatar.large {
+  width: 61px;
+  height: 61px;
+  font-size: 19px;
+}
+
 .header-user-name {
   font-size: 12px;
   font-weight: 650;
@@ -835,6 +864,25 @@ code {
   font-size: 14px;
 }
 
+.auth-switch {
+  text-align: center;
+  font-size: 12px;
+  color: #7e8c86;
+  margin-top: 25px;
+}
+
+.auth-switch .text-button {
+  font-size: 12px;
+  margin-left: 3px;
+}
+
+.auth-footer {
+  text-align: center;
+  color: #a0aaa5;
+  font-size: 10px;
+  margin-top: 30px;
+}
+
 .demo-accounts {
   font-size: 11px;
   color: #84918a;
@@ -866,6 +914,23 @@ code {
 .demo-accounts dd {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.register-page {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.register-page .auth-brand {
+  margin-bottom: 20px;
+}
+
+.register-page .auth-card {
+  padding-top: 24px;
+}
+
+.register-page .auth-card .field {
+  margin-bottom: 14px;
 }
 
 .boot-screen {
@@ -939,6 +1004,12 @@ code {
   overscroll-behavior: contain;
 }
 
+.modal-body .section-copy {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
 .confirm-copy {
   font-size: 14px;
   line-height: 1.8;
@@ -973,6 +1044,22 @@ code {
   width: 25px;
   height: 25px;
   margin-left: auto;
+}
+
+.profile-intro {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 29px;
+}
+
+.profile-intro strong {
+  font-size: 18px;
+}
+
+.profile-intro p {
+  font-size: 12px;
+  margin-top: 7px;
 }
 
 table {
@@ -1120,6 +1207,10 @@ tbody tr:hover {
   .stat-icon {
     width: 38px;
     height: 38px;
+  }
+
+  .two-columns {
+    gap: 20px;
   }
 
   .main-nav {
@@ -1320,6 +1411,14 @@ tbody tr:hover {
     font-size: 18px;
   }
 
+  .two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    gap: 13px;
+  }
+
   .btn {
     font-size: 12px;
     padding: 11px 14px;
@@ -1361,6 +1460,16 @@ tbody tr:hover {
 
   .modal-body {
     padding: 21px;
+  }
+
+  .profile-intro strong {
+    font-size: 16px;
+  }
+
+  .profile-intro .avatar {
+    width: 51px;
+    height: 51px;
+    font-size: 15px;
   }
 
   td {
@@ -1405,6 +1514,21 @@ tbody tr:hover {
     font-size: 23px;
   }
 
+  .register-page .auth-brand .brand-mark {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+  }
+
+  .register-page .auth-brand .brand {
+    gap: 11px;
+    font-size: 25px;
+  }
+
+  .register-page .auth-brand > p {
+    font-size: 10px;
+  }
+
   .demo-accounts dl {
     font-size: 9px;
     grid-template-columns: 75px 1fr;
@@ -1419,4 +1543,20 @@ tbody tr:hover {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+.remember-email {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  color: #74877b;
+  margin-bottom: 17px;
+}
+
+.remember-email input {
+  accent-color: var(--green);
+  width: 14px;
+  height: 14px;
+  margin: 0;
 }

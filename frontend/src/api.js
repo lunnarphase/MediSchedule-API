@@ -123,3 +123,7 @@ export const money = (value) =>
   new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN" }).format(
     Number(value || 0),
   );
+
+export function validPhone(value) {
+  return /^[+0-9 ()-]*$/.test(value || "");
+}
