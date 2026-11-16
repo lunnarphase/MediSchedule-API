@@ -7,15 +7,22 @@ import { Appointments } from "./features/patient/Appointments";
 import { useData } from "./api";
 import { Notifications } from "./features/Notifications";
 
+import { DoctorDashboard } from "./features/doctor/Dashboard";
+import { DoctorAppointments } from "./features/doctor/Appointments";
+
 const patientMenu = [
   ["home", "Strona główna", "chart"],
   ["appointments", "Moje wizyty", "calendar"],
   ["doctors", "Nasi specjaliści", "users"],
 ];
+const doctorMenu = [
+  ["home", "Panel lekarza", "chart"],
+  ["appointments", "Moje wizyty", "calendar"],
+];
 const roles = { patient: "Pacjent", doctor: "Lekarz", admin: "Administrator" };
 
 function defaultRoute(role) {
-  return role === "patient" ? "home" : "profile";
+  return role === "patient" || role === "doctor" ? "home" : "profile";
 }
 
 function readRoute(role) {
@@ -23,7 +30,11 @@ function readRoute(role) {
   const allowed = [
     "profile",
     "notifications",
-    ...(role === "patient" ? patientMenu.map(([key]) => key) : []),
+    ...(role === "patient"
+      ? patientMenu.map(([key]) => key)
+      : role === "doctor"
+        ? doctorMenu.map(([key]) => key)
+        : []),
   ];
   return allowed.includes(route) ? route : defaultRoute(role);
 }
@@ -62,8 +73,16 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
       ? { home: <PatientDashboard />, appointments: <Appointments /> }
       : {}),
     notifications: <Notifications />,
+    ...(user.role === "doctor"
+      ? { home: <DoctorDashboard />, appointments: <DoctorAppointments /> }
+      : {}),
   };
-  const items = user.role === "patient" ? patientMenu : [];
+  const items =
+    user.role === "patient"
+      ? patientMenu
+      : user.role === "doctor"
+        ? doctorMenu
+        : [];
 
   return (
     <AppContext.Provider value={{ user, setUser, navigate, notify, changed }}>

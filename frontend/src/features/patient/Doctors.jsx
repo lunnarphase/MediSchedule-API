@@ -16,7 +16,7 @@ import {
   useApp,
   useMutation,
 } from "../../components";
-import { ReviewList } from "./Reviews";
+import { ReviewList } from "../ReviewList";
 
 export function DoctorCard({ doctor, onSelect, compact = false }) {
   return (
