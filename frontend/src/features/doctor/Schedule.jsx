@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addDays, api, dateLabel, localDate, useData } from "../../api";
 import {
   Badge,
@@ -11,6 +11,7 @@ import {
   useApp,
   useMutation,
 } from "../../components";
+import { ScheduleTemplates } from "./Templates";
 
 function monday(value) {
   const date = new Date(`${value}T12:00:00`);
@@ -33,9 +34,15 @@ export function Schedule() {
   const end = addDays(week, 6);
   const state = useData(`/doctor/availability?from=${week}&to=${end}`, []);
   const mutation = useMutation();
-  const { changed, notify } = useApp();
+  const { changed, notify, setNavigationBlocked } = useApp();
   const dirty = draft !== null;
   const ranges = draft ?? editorRanges(state.data || []);
+  const templates = useData("/doctor/templates", []);
+  const [template, setTemplate] = useState("");
+  useEffect(() => {
+    setNavigationBlocked(dirty);
+    return () => setNavigationBlocked(false);
+  }, [dirty, setNavigationBlocked]);
 
   function update(change) {
     setDraft((current) => change(current ?? editorRanges(state.data || [])));
@@ -50,6 +57,22 @@ export function Schedule() {
     update((current) => [
       ...current,
       { key: crypto.randomUUID(), date, startTime: "09:00", endTime: "17:00" },
+    ]);
+  }
+  function applyTemplate(date) {
+    const found = templates.data?.find((item) => String(item.id) === template);
+    if (!found) {
+      mutation.setError("Najpierw wybierz szablon z listy.");
+      return;
+    }
+    update((current) => [
+      ...current,
+      {
+        key: crypto.randomUUID(),
+        date,
+        startTime: found.startTime.slice(0, 5),
+        endTime: found.endTime.slice(0, 5),
+      },
     ]);
   }
 
@@ -109,7 +132,7 @@ export function Schedule() {
       <ErrorBox retry={state.error ? state.refresh : undefined}>
         {mutation.error || state.error}
       </ErrorBox>
-      <div className="">
+      <div className="schedule-layout">
         <section className="card schedule-card">
           <div className="week-navigation">
             <button
@@ -270,6 +293,15 @@ export function Schedule() {
                         >
                           + Dodaj godziny
                         </button>
+                        {template && (
+                          <button
+                            className="text-button small-copy"
+                            disabled={mutation.busy}
+                            onClick={() => applyTemplate(date)}
+                          >
+                            Użyj szablonu
+                          </button>
+                        )}
                       </div>
                     )}
                   </article>
@@ -290,6 +322,12 @@ export function Schedule() {
             </Button>
           </div>
         </section>
+        <ScheduleTemplates
+          state={templates}
+          selected={template}
+          onSelect={setTemplate}
+          busy={mutation.busy}
+        />
       </div>
       {pendingWeek && (
         <Confirm

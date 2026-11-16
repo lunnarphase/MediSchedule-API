@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AppContext, Brand, Confirm, Icon } from "./components";
 import { Profile } from "./features/Profile";
 import { Doctors } from "./features/patient/Doctors";
@@ -44,32 +44,112 @@ function readRoute(role) {
 }
 
 export default function Shell({ user, setUser, onLogout, notify, changed }) {
-  const [route, setRoute] = useState(() => readRoute(user.role));
-  const [mobile, setMobile] = useState(false);
-  const [logout, setLogout] = useState(false);
+  const [route, setRoute] = useState(() => readRoute(user.role)),
+    [mobile, setMobile] = useState(false),
+    [logout, setLogout] = useState(false),
+    [pendingNavigation, setPendingNavigation] = useState(null);
+  const activeRoute = useRef(route),
+    navigationBlocked = useRef(false),
+    historyIndex = useRef(history.state?.medischeduleIndex ?? 0),
+    restoringNavigation = useRef(null);
+  const setNavigationBlocked = useCallback((blocked) => {
+    navigationBlocked.current = blocked;
+  }, []);
   const notifications = useData("/notifications", []);
+  function applyRoute(next) {
+    activeRoute.current = next;
+    setRoute(next);
+    setMobile(false);
+    window.scrollTo({ top: 0 });
+  }
+  function commitNavigation(next) {
+    if (next === activeRoute.current) {
+      setMobile(false);
+      return;
+    }
+    historyIndex.current += 1;
+    history.pushState(
+      { ...history.state, medischeduleIndex: historyIndex.current },
+      "",
+      `#/${next}`,
+    );
+    applyRoute(next);
+  }
+  useEffect(() => {
+    history.replaceState(
+      { ...history.state, medischeduleIndex: historyIndex.current },
+      "",
+      `#/${activeRoute.current}`,
+    );
+    const routeChange = () => {
+      const next = readRoute(user.role);
+      const targetIndex = history.state?.medischeduleIndex;
+      if (restoringNavigation.current) {
+        if (next === activeRoute.current) {
+          const pending = restoringNavigation.current;
+          restoringNavigation.current = null;
+          setPendingNavigation(pending);
+        }
+        return;
+      }
+      if (next === activeRoute.current) {
+        if (location.hash !== `#/${next}`)
+          history.replaceState(history.state, "", `#/${next}`);
+        return;
+      }
+      const delta =
+        Number.isInteger(targetIndex) && targetIndex !== historyIndex.current
+          ? targetIndex - historyIndex.current
+          : null;
+      if (navigationBlocked.current) {
+        const pending = { next, historyDelta: delta };
+        if (delta !== null) {
+          restoringNavigation.current = pending;
+          history.go(-delta);
+        } else {
+          history.replaceState(
+            { ...history.state, medischeduleIndex: historyIndex.current },
+            "",
+            `#/${activeRoute.current}`,
+          );
+          setPendingNavigation(pending);
+        }
+        return;
+      }
+      if (delta !== null) historyIndex.current = targetIndex;
+      else {
+        historyIndex.current += 1;
+        history.replaceState(
+          { ...history.state, medischeduleIndex: historyIndex.current },
+          "",
+          location.href,
+        );
+      }
+      applyRoute(next);
+    };
+    const beforeUnload = (event) => {
+      if (!navigationBlocked.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("popstate", routeChange);
+    window.addEventListener("hashchange", routeChange);
+    window.addEventListener("beforeunload", beforeUnload);
+    return () => {
+      window.removeEventListener("popstate", routeChange);
+      window.removeEventListener("hashchange", routeChange);
+      window.removeEventListener("beforeunload", beforeUnload);
+    };
+  }, []);
+  const navigate = (next) => {
+    if (navigationBlocked.current && next !== activeRoute.current) {
+      setPendingNavigation({ next });
+      setMobile(false);
+    } else commitNavigation(next);
+  };
   const unread = (notifications.data || []).filter(
     (notice) => !notice.read,
   ).length;
-
-  useEffect(() => {
-    const syncRoute = () => {
-      const next = readRoute(user.role);
-      if (location.hash !== `#/${next}`)
-        history.replaceState(history.state, "", `#/${next}`);
-      setRoute(next);
-      setMobile(false);
-      window.scrollTo({ top: 0 });
-    };
-    syncRoute();
-    window.addEventListener("hashchange", syncRoute);
-    return () => window.removeEventListener("hashchange", syncRoute);
-  }, [user.role]);
-
-  const navigate = (next) => {
-    location.hash = `/${next}`;
-    setMobile(false);
-  };
   const views = {
     profile: <Profile />,
     ...(user.role === "patient" ? { doctors: <Doctors /> } : {}),
@@ -91,7 +171,9 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
         : [];
 
   return (
-    <AppContext.Provider value={{ user, setUser, navigate, notify, changed }}>
+    <AppContext.Provider
+      value={{ user, setUser, navigate, notify, changed, setNavigationBlocked }}
+    >
       <div className="app-shell">
         <header className="app-header">
           <a
@@ -190,6 +272,23 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
           <span>MediSchedule</span>
           <span>System rezerwacji wizyt</span>
         </footer>
+        {pendingNavigation && (
+          <Confirm
+            title="Pominąć niezapisane zmiany?"
+            label="Opuść grafik"
+            onClose={() => setPendingNavigation(null)}
+            onConfirm={async () => {
+              const pending = pendingNavigation;
+              navigationBlocked.current = false;
+              if (pending.historyDelta != null)
+                history.go(pending.historyDelta);
+              else commitNavigation(pending.next);
+            }}
+          >
+            Masz niezapisane zmiany w grafiku. Opuść widok, aby je odrzucić,
+            albo wybierz „Wróć”, aby kontynuować edycję.
+          </Confirm>
+        )}
         {logout && (
           <Confirm
             title="Wylogować się?"
@@ -198,7 +297,9 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
             onClose={() => setLogout(false)}
             onConfirm={onLogout}
           >
-            Zakończysz bieżącą sesję w MediSchedule.
+            {navigationBlocked.current
+              ? "Masz niezapisane zmiany w grafiku. Wylogowanie spowoduje ich utratę."
+              : "Zakończysz bieżącą sesję w MediSchedule."}
           </Confirm>
         )}
       </div>
