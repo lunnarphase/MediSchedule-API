@@ -8,6 +8,8 @@ import {
   RefreshButton,
   Stat,
   useApp,
+  Button,
+  Icon,
 } from "../../components";
 import { DoctorAppointmentList } from "./Appointments";
 import { ReviewList } from "../ReviewList";
@@ -35,6 +37,12 @@ export function DoctorDashboard() {
       <PageHeading
         title={`Dzień dobry, ${user.name}`}
         description="Sprawdź dzisiejsze konsultacje i zaplanuj kolejny tydzień."
+        actions={
+          <Button variant="secondary" onClick={() => navigate("schedule")}>
+            <Icon name="calendar" size={17} />
+            Zarządzaj grafikiem
+          </Button>
+        }
       />
       <div className="stats-grid">
         <Stat
@@ -74,6 +82,13 @@ export function DoctorDashboard() {
                 Zarządzaj dostępnością, aby pacjenci mogli rezerwować kolejne
                 konsultacje.
               </Empty>
+              <Button
+                variant="secondary"
+                className="full-width"
+                onClick={() => navigate("schedule")}
+              >
+                Przejdź do grafiku
+              </Button>
             </section>
           )}
           <div className="section-heading spaced">

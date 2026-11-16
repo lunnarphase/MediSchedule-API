@@ -413,6 +413,20 @@ code {
   color: var(--green);
 }
 
+.danger-icon {
+  color: #b35353;
+}
+
+.danger-icon:hover:not(:disabled) {
+  background: #fff0ed;
+  color: #a73232;
+}
+
+.reverse-chevron {
+  transform: rotate(180deg);
+  display: flex;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -523,6 +537,12 @@ code {
   background: #ecf6ef;
   color: #247345;
   border: 1px solid #d6ebdd;
+}
+
+.notice.warning {
+  background: #fff7e4;
+  color: #8c6622;
+  border: 1px solid #f7e8bf;
 }
 
 .notice .text-button {
@@ -1877,6 +1897,139 @@ code {
   background: #53a16a;
 }
 
+.schedule-card {
+  padding: 0;
+}
+
+.week-navigation {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 21px 23px;
+  border-bottom: 1px solid var(--line);
+}
+
+.week-navigation > div {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.week-navigation strong {
+  font-size: 15px;
+  color: #42604e;
+}
+
+.week-navigation .text-button {
+  font-size: 10px !important;
+}
+
+.schedule-days {
+  display: grid;
+}
+
+.schedule-day {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 19px 22px;
+  min-height: 94px;
+  border-bottom: 1px solid #e8efea;
+}
+
+.schedule-date {
+  width: 105px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.schedule-date strong {
+  font-size: 12px;
+  color: #4a6555;
+  text-transform: capitalize;
+}
+
+.schedule-date > span:not(.badge) {
+  font-size: 11px;
+  color: #92a092;
+}
+
+.schedule-date .badge {
+  align-self: flex-start;
+  font-size: 8px;
+  padding: 2px 6px;
+  margin-top: 1px;
+}
+
+.schedule-ranges {
+  flex: 1;
+  display: grid;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.schedule-range {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.schedule-range > span {
+  color: #99a99d;
+  font-size: 12px;
+}
+
+.schedule-range input {
+  width: 95px;
+  border: 1px solid #dce7df;
+  background: white;
+  border-radius: 7px;
+  padding: 7px 8px;
+  font-size: 12px;
+  color: #42604e;
+  min-height: 36px;
+}
+
+.schedule-day-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.schedule-day-actions .text-button {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.schedule-day.past {
+  background: #fafcfb;
+  opacity: 0.6;
+}
+
+.schedule-save {
+  padding: 20px 22px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.schedule-save p {
+  max-width: 280px;
+  line-height: 1.6;
+  font-size: 10px !important;
+}
+
+.schedule-card > .notice {
+  margin: 15px 20px 0;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -2035,6 +2188,19 @@ tbody tr:hover {
 
   .compact .doctor-avatar {
     display: none;
+  }
+
+  .schedule-card {
+    padding: 0;
+  }
+
+  .schedule-day {
+    padding: 18px;
+    gap: 15px;
+  }
+
+  .schedule-date {
+    width: 80px;
   }
 
   .filter-chips button {
@@ -2690,6 +2856,74 @@ tbody tr:hover {
     width: 51px;
     height: 51px;
     font-size: 15px;
+  }
+
+  .schedule-card {
+    padding: 0;
+  }
+
+  .week-navigation {
+    padding: 18px 12px;
+    gap: 10px;
+  }
+
+  .week-navigation strong {
+    font-size: 13px;
+  }
+
+  .schedule-day {
+    padding: 16px 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .schedule-date {
+    width: 80px;
+  }
+
+  .schedule-ranges {
+    min-width: 220px;
+  }
+
+  .schedule-day-actions {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 20px;
+  }
+
+  .schedule-range input {
+    width: 84px;
+    font-size: 11px;
+    padding: 7px 5px;
+  }
+
+  .schedule-range {
+    gap: 5px;
+  }
+
+  .schedule-range .icon-button {
+    width: 26px;
+    height: 28px;
+  }
+
+  .schedule-date strong {
+    font-size: 11px;
+  }
+
+  .schedule-date > span:not(.badge) {
+    font-size: 10px;
+  }
+
+  .schedule-save {
+    padding: 17px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .schedule-save p {
+    max-width: none;
   }
 
   td {

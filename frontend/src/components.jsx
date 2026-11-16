@@ -75,6 +75,11 @@ export function Icon({ name = "plus", size = 20, ...props }) {
         <path d="M3 3v18h19M7 16v-4m5 4V8m5 8V5" />
       </>
     ),
+    trash: (
+      <>
+        <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7" />
+      </>
+    ),
     menu: <path d="M3 5h18M3 12h18M3 19h18" />,
   };
   return (

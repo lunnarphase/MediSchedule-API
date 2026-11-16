@@ -93,7 +93,11 @@ export function useData(path, initial = null) {
       });
     return () => controller.abort();
   }, [path, revision]);
-  return { ...state, refresh };
+  const replaceData = useCallback(
+    (data) => setState({ data, loading: false, error: "" }),
+    [],
+  );
+  return { ...state, refresh, replaceData };
 }
 export function localDate(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;

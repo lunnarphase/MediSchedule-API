@@ -10,6 +10,7 @@ import { Notifications } from "./features/Notifications";
 import { DoctorDashboard } from "./features/doctor/Dashboard";
 import { DoctorAppointments } from "./features/doctor/Appointments";
 import { DoctorProfile } from "./features/doctor/Profile";
+import { Schedule } from "./features/doctor/Schedule";
 
 const patientMenu = [
   ["home", "Strona główna", "chart"],
@@ -19,6 +20,7 @@ const patientMenu = [
 const doctorMenu = [
   ["home", "Panel lekarza", "chart"],
   ["appointments", "Moje wizyty", "calendar"],
+  ["schedule", "Mój grafik", "clock"],
   ["doctor-profile", "Profil lekarza", "users"],
 ];
 const roles = { patient: "Pacjent", doctor: "Lekarz", admin: "Administrator" };
@@ -79,6 +81,7 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
       ? { home: <DoctorDashboard />, appointments: <DoctorAppointments /> }
       : {}),
     ...(user.role === "doctor" ? { "doctor-profile": <DoctorProfile /> } : {}),
+    ...(user.role === "doctor" ? { schedule: <Schedule /> } : {}),
   };
   const items =
     user.role === "patient"
