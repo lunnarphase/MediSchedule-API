@@ -41,6 +41,7 @@ export function AdminDashboard() {
       "Zgłoszenia i decyzje moderacyjne.",
       "star",
     ],
+    ["security", "Bezpieczeństwo", "Próby logowania i blokady IP.", "shield"],
   ];
   function refresh() {
     users.refresh();

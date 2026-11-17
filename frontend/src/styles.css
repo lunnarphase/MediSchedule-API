@@ -463,7 +463,8 @@ code {
 .field input,
 .field select,
 .field textarea,
-.search-input {
+.search-input,
+.security-search input {
   border: 1px solid #d9e1e6;
   border-radius: 9px;
   min-height: 45px;
@@ -504,6 +505,7 @@ code {
 
 .field input::placeholder,
 .search-input::placeholder,
+.security-search input::placeholder,
 .field textarea::placeholder {
   color: #97a3ad;
 }
@@ -2405,8 +2407,58 @@ tbody tr:hover {
   background: #f6f9f7;
 }
 
+.security-search {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-width: 600px;
+}
+
+.security-search input {
+  min-height: 37px;
+  padding: 8px 10px;
+  font-size: 11px;
+  width: 160px;
+}
+
+.security-search .btn {
+  min-height: 37px;
+  font-size: 11px;
+}
+
 .table-toolbar h2 {
   font-size: 17px;
+}
+
+.table-footer {
+  padding: 17px 23px;
+  border-top: 1px solid var(--line);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 23px;
+}
+
+.detail-grid > div {
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-grid span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.detail-grid strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
 }
 
 @keyframes spin {
@@ -2573,6 +2625,10 @@ tbody tr:hover {
     padding: 8px 10px;
   }
 
+  .security-search input {
+    width: 135px;
+  }
+
   .table-toolbar h2 {
     font-size: 15px;
   }
@@ -2671,6 +2727,16 @@ tbody tr:hover {
 
   .table-toolbar {
     flex-wrap: wrap;
+  }
+
+  .security-search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .security-search input {
+    flex: 1;
+    width: auto;
   }
 
   .list-toolbar {
@@ -3450,6 +3516,21 @@ tbody tr:hover {
     flex: 1;
   }
 
+  .security-search {
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .security-search input {
+    width: calc(50% - 7px);
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .security-search > .btn {
+    width: 100%;
+  }
+
   .moderation-summary p {
     font-size: 12px;
   }
@@ -3472,6 +3553,10 @@ tbody tr:hover {
 
   .compact-visit small {
     font-size: 9px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
   }
 
   .notice {
