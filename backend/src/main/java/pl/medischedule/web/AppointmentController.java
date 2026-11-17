@@ -1,5 +1,7 @@
 package pl.medischedule.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +10,7 @@ import pl.medischedule.service.AppointmentService;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Wizyty")
 public class AppointmentController {
   private final AppointmentService service;
   private final CurrentUser current;
@@ -23,6 +26,11 @@ public class AppointmentController {
   }
 
   @PostMapping("/appointments")
+  @Operation(
+      summary = "Rezerwacja wizyty",
+      description =
+          "Tylko pacjent. Cały przedział musi mieścić się w grafiku. Kolizja wizyty lekarza lub"
+              + " pacjenta zwraca 409.")
   @ResponseStatus(HttpStatus.CREATED)
   Object book(@RequestBody Booking body) {
     return service.book(body.doctorId, body.date, body.time);

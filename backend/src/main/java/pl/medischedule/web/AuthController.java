@@ -1,5 +1,8 @@
 package pl.medischedule.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -16,6 +19,7 @@ import pl.medischedule.service.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Logowanie")
 public class AuthController {
   private final AuthenticationManager authenticationManager;
   private final SecurityContextRepository contexts;
@@ -41,11 +45,15 @@ public class AuthController {
       @NotBlank @Size(max = 1024) String password) {}
 
   @GetMapping("/csrf")
-  public Map<String, String> csrf(CsrfToken token) {
+  @Operation(summary = "Pobranie tokena CSRF do operacji zapisu")
+  public Map<String, String> csrf(@Parameter(hidden = true) CsrfToken token) {
     return Map.of("token", token.getToken(), "headerName", token.getHeaderName());
   }
 
   @PostMapping("/login")
+  @Operation(
+      summary = "Logowanie do sesji",
+      description = "Nie tworzy tokena JWT. Wymaga tokena CSRF.")
   public UserService.UserView login(
       @Valid @RequestBody LoginRequest body,
       HttpServletRequest request,
@@ -71,6 +79,7 @@ public class AuthController {
   }
 
   @PostMapping("/register")
+  @Operation(summary = "Rejestracja konta pacjenta")
   @ResponseStatus(HttpStatus.CREATED)
   public UserService.UserView register(@Valid @RequestBody UserService.RegisterRequest body) {
     return users.register(body);
