@@ -125,6 +125,10 @@ code {
   width: 100%;
 }
 
+.align-right {
+  text-align: right;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -2076,6 +2080,42 @@ code {
   color: #93a195;
 }
 
+.table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 21px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table-toolbar > .field {
+  margin: 0;
+  max-width: 250px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.table-toolbar > .field > label {
+  font-size: 9px;
+}
+
+.table-toolbar > .field select {
+  min-height: 36px;
+  font-size: 12px;
+  padding: 7px 12px;
+}
+
+.table-scroll {
+  overflow: auto;
+  width: 100%;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -2122,6 +2162,82 @@ tbody tr:last-child td {
 
 tbody tr:hover {
   background: #fbfdfb;
+}
+
+.table-person {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.table-person > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.table-person strong {
+  font-size: 12px;
+  font-weight: 650;
+  color: #385141;
+}
+
+.table-person small {
+  font-size: 10px;
+  color: #92a195;
+}
+
+.table-person .avatar {
+  width: 33px;
+  height: 33px;
+  font-size: 9px;
+}
+
+.role-label {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #edf3f0;
+  color: #6e8979;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.role-label.doctor {
+  background: #edf4fb;
+  color: #6386a1;
+}
+
+.role-label.admin {
+  background: #f2eff7;
+  color: #8c7caa;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.table-actions .btn {
+  min-height: 31px;
+  padding: 6px 10px;
+  font-size: 10px;
+}
+
+.table-actions .icon-button {
+  width: 30px;
+  height: 30px;
+}
+
+.you-label {
+  font-size: 8px;
+  background: #e7f3e9;
+  border-radius: 4px;
+  color: #578263;
+  padding: 2px 5px;
+  margin-left: 7px;
 }
 
 .admin-shortcuts {
@@ -2232,6 +2348,10 @@ tbody tr:hover {
   max-width: 250px;
 }
 
+.table-toolbar h2 {
+  font-size: 17px;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -2313,6 +2433,10 @@ tbody tr:hover {
     padding: 23px;
   }
 
+  .table-card {
+    padding: 0;
+  }
+
   .doctor-card {
     padding: 20px;
   }
@@ -2379,9 +2503,21 @@ tbody tr:hover {
     padding: 20px;
   }
 
+  .table-toolbar {
+    padding: 18px 20px;
+  }
+
+  .table-toolbar .filter-chips {
+    gap: 1px;
+  }
+
   .filter-chips button {
     font-size: 11px;
     padding: 8px 10px;
+  }
+
+  .table-toolbar h2 {
+    font-size: 15px;
   }
 }
 
@@ -2470,6 +2606,10 @@ tbody tr:hover {
 
   .two-columns {
     gap: 20px;
+  }
+
+  .table-toolbar {
+    flex-wrap: wrap;
   }
 
   .list-toolbar {
@@ -3144,6 +3284,25 @@ tbody tr:hover {
     gap: 20px;
   }
 
+  .table-card {
+    padding: 0;
+  }
+
+  .table-toolbar {
+    padding: 17px;
+    gap: 15px;
+  }
+
+  .table-toolbar .search-input {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .table-toolbar > .field {
+    max-width: none;
+    width: 100%;
+  }
+
   td {
     padding: 15px 17px;
   }
@@ -3151,6 +3310,23 @@ tbody tr:hover {
   th {
     padding: 13px 17px;
     font-size: 8px;
+  }
+
+  .table-person {
+    gap: 10px;
+  }
+
+  .table-person .avatar {
+    width: 29px;
+    height: 29px;
+  }
+
+  .table-person strong {
+    font-size: 11px;
+  }
+
+  .table-person small {
+    font-size: 9px;
   }
 
   .admin-shortcuts {

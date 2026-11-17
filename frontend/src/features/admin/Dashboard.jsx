@@ -27,7 +27,9 @@ export function AdminDashboard() {
   const doctors = (users.data || []).filter(
     (user) => user.role === "doctor" && !user.blocked,
   ).length;
-  const shortcuts = [];
+  const shortcuts = [
+    ["users", "Użytkownicy", "Konta i uprawnienia użytkowników.", "users"],
+  ];
   function refresh() {
     users.refresh();
     appointments.refresh();

@@ -13,6 +13,7 @@ import { DoctorProfile } from "./features/doctor/Profile";
 import { Schedule } from "./features/doctor/Schedule";
 
 import { AdminDashboard } from "./features/admin/Dashboard";
+import { AdminUsers } from "./features/admin/Users";
 
 const patientMenu = [
   ["home", "Strona główna", "chart"],
@@ -25,7 +26,10 @@ const doctorMenu = [
   ["schedule", "Mój grafik", "clock"],
   ["doctor-profile", "Profil lekarza", "users"],
 ];
-const adminMenu = [["home", "Panel administratora", "chart"]];
+const adminMenu = [
+  ["home", "Panel administratora", "chart"],
+  ["users", "Użytkownicy", "users"],
+];
 const roles = { patient: "Pacjent", doctor: "Lekarz", admin: "Administrator" };
 
 function defaultRoute() {
@@ -163,6 +167,7 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
       : {}),
     notifications: <Notifications />,
     ...(user.role === "admin" ? { home: <AdminDashboard /> } : {}),
+    ...(user.role === "admin" ? { users: <AdminUsers /> } : {}),
     ...(user.role === "doctor"
       ? { home: <DoctorDashboard />, appointments: <DoctorAppointments /> }
       : {}),

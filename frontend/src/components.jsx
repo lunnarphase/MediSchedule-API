@@ -86,6 +86,11 @@ export function Icon({ name = "plus", size = 20, ...props }) {
         <path d="m8 12 3 3 5-6" />
       </>
     ),
+    edit: (
+      <>
+        <path d="m16 3 5 5-12 12-6 1 1-6zM13 6l5 5" />
+      </>
+    ),
     menu: <path d="M3 5h18M3 12h18M3 19h18" />,
   };
   return (
