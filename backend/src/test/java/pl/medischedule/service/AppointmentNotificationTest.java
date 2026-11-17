@@ -21,7 +21,6 @@ class AppointmentNotificationTest {
   private final AppointmentRepository appointments = mock(AppointmentRepository.class);
   private final CurrentUser current = mock(CurrentUser.class);
   private final NotificationService notifications = mock(NotificationService.class);
-  private final EmailOutbox outbox = mock(EmailOutbox.class);
   private final AppointmentService service =
       new AppointmentService(
           appointments,
@@ -30,8 +29,7 @@ class AppointmentNotificationTest {
           mock(AvailabilityRepository.class),
           current,
           mock(Views.class),
-          notifications,
-          outbox);
+          notifications);
   private Appointment appointment;
 
   @BeforeEach

@@ -43,7 +43,8 @@ class DataLayerIntegrationTest {
   @Test
   void migrationCreatesSchemaAndDoesNotDuplicateDictionaries() {
     assertThat(flyway.migrate().migrationsExecuted).isZero();
-    assertThat(flyway.info().applied()).hasSize(1);
+    assertThat(flyway.info().applied()).hasSize(2);
+    assertThat(jdbc.queryForObject("SELECT to_regclass('email_jobs')", String.class)).isNull();
     assertThat(jdbc.queryForList("SELECT name FROM roles", String.class))
         .containsExactlyInAnyOrder("admin", "doctor", "patient");
     assertThat(jdbc.queryForObject("SELECT count(*) FROM specializations", Long.class))

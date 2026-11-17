@@ -108,7 +108,7 @@ class AppointmentIntegrationTest extends ApiIntegrationTestSupport {
   }
 
   @Test
-  void bookedDurationIsStableAndEmailIsQueuedWithoutSmtp() throws Exception {
+  void bookedDurationRemainsStableWhenDoctorChangesConsultationLength() throws Exception {
     book(patient, "09:00");
     mvc.perform(
             put("/api/doctor/profile")
@@ -120,16 +120,10 @@ class AppointmentIntegrationTest extends ApiIntegrationTestSupport {
     mvc.perform(get("/api/appointments").session(patient))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].endTime").value("09:45"));
-    String email =
-        body(mvc.perform(get("/api/profile").session(patient)).andReturn()).get("email").asText();
-    assertThat(
-            jdbc.queryForObject(
-                "SELECT body FROM email_jobs WHERE recipient=?", String.class, email))
-        .contains("09:00–09:45");
-    assertThat(
-            jdbc.queryForObject(
-                "SELECT status FROM email_jobs WHERE recipient=?", String.class, email))
-        .isEqualTo("pending");
+    book(otherPatient, "10:00");
+    mvc.perform(get("/api/appointments").session(otherPatient))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].endTime").value("10:30"));
   }
 
   @Test

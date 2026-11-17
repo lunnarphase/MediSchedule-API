@@ -22,7 +22,6 @@ public class AppointmentService {
   private final CurrentUser current;
   private final Views views;
   private final NotificationService notifications;
-  private final EmailOutbox outbox;
 
   public AppointmentService(
       AppointmentRepository appointments,
@@ -31,8 +30,7 @@ public class AppointmentService {
       AvailabilityRepository availability,
       CurrentUser current,
       Views views,
-      NotificationService notifications,
-      EmailOutbox outbox) {
+      NotificationService notifications) {
     this.appointments = appointments;
     this.doctors = doctors;
     this.patients = patients;
@@ -40,7 +38,6 @@ public class AppointmentService {
     this.current = current;
     this.views = views;
     this.notifications = notifications;
-    this.outbox = outbox;
   }
 
   public List<Map<String, Object>> list() {
@@ -80,7 +77,6 @@ public class AppointmentService {
         "Nowa rezerwacja: pacjent " + p.user.name + ", " + visitDateTime(a) + ".",
         "appointment",
         a.id);
-    outbox.appointment(a, "Potwierdzenie rezerwacji wizyty");
     return views.appointment(a);
   }
 
@@ -169,7 +165,6 @@ public class AppointmentService {
         "Pacjent " + a.patient.user.name + " anulował wizytę: " + visitDateTime(a) + ".",
         "appointment",
         a.id);
-    outbox.appointment(a, "Anulowanie wizyty");
     return views.appointment(a);
   }
 
@@ -202,7 +197,6 @@ public class AppointmentService {
             "Wizyta zakończona: " + visitDescription(a) + ". Możesz wystawić opinię.",
             "review_request",
             a.id);
-      if (status.equals("cancelled")) outbox.appointment(a, "Anulowanie wizyty przez lekarza");
     }
     return views.appointment(a);
   }
