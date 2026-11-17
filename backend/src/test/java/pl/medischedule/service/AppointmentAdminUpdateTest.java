@@ -30,7 +30,8 @@ class AppointmentAdminUpdateTest {
           availability,
           current,
           mock(Views.class),
-          mock(NotificationService.class));
+          mock(NotificationService.class),
+          mock(EmailQueueService.class));
   private Appointment appointment;
   private LocalDate date;
 

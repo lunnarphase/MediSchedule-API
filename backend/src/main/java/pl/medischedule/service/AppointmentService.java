@@ -22,6 +22,7 @@ public class AppointmentService {
   private final CurrentUser current;
   private final Views views;
   private final NotificationService notifications;
+  private final EmailQueueService emails;
 
   public AppointmentService(
       AppointmentRepository appointments,
@@ -30,7 +31,8 @@ public class AppointmentService {
       AvailabilityRepository availability,
       CurrentUser current,
       Views views,
-      NotificationService notifications) {
+      NotificationService notifications,
+      EmailQueueService emails) {
     this.appointments = appointments;
     this.doctors = doctors;
     this.patients = patients;
@@ -38,6 +40,7 @@ public class AppointmentService {
     this.current = current;
     this.views = views;
     this.notifications = notifications;
+    this.emails = emails;
   }
 
   public List<Map<String, Object>> list() {
@@ -77,6 +80,7 @@ public class AppointmentService {
         "Nowa rezerwacja: pacjent " + p.user.name + ", " + visitDateTime(a) + ".",
         "appointment",
         a.id);
+    emails.confirmation(a);
     return views.appointment(a);
   }
 

@@ -21,7 +21,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-@SpringBootTest(properties = "app.demo.enabled=false")
+@SpringBootTest(properties = {"app.demo.enabled=false", "app.mail.enabled=false"})
 @Transactional
 class DataLayerIntegrationTest {
   @Container
@@ -43,8 +43,9 @@ class DataLayerIntegrationTest {
   @Test
   void migrationCreatesSchemaAndDoesNotDuplicateDictionaries() {
     assertThat(flyway.migrate().migrationsExecuted).isZero();
-    assertThat(flyway.info().applied()).hasSize(2);
-    assertThat(jdbc.queryForObject("SELECT to_regclass('email_jobs')", String.class)).isNull();
+    assertThat(flyway.info().applied()).hasSize(3);
+    assertThat(jdbc.queryForObject("SELECT to_regclass('email_jobs')", String.class))
+        .isEqualTo("email_jobs");
     assertThat(jdbc.queryForList("SELECT name FROM roles", String.class))
         .containsExactlyInAnyOrder("admin", "doctor", "patient");
     assertThat(jdbc.queryForObject("SELECT count(*) FROM specializations", Long.class))

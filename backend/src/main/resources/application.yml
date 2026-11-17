@@ -18,6 +18,18 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: false
+  mail:
+    host: ${SMTP_HOST:mailpit}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      "[mail.smtp.auth]": ${SMTP_AUTH:false}
+      "[mail.smtp.starttls.enable]": ${SMTP_STARTTLS:false}
+      "[mail.smtp.connectiontimeout]": 5000
+      "[mail.smtp.timeout]": 5000
+      "[mail.smtp.writetimeout]": 5000
 server:
   port: ${PORT:8080}
   forward-headers-strategy: native
@@ -32,6 +44,9 @@ server:
     include-message: never
     include-stacktrace: never
 management:
+  health:
+    mail:
+      enabled: false
   endpoints:
     web:
       exposure:
@@ -39,3 +54,17 @@ management:
 app:
   demo:
     enabled: ${DEMO_ENABLED:false}
+    password: ${DEMO_PASSWORD:}
+  mail:
+    enabled: ${MAIL_ENABLED:true}
+    dispatcher-enabled: true
+    from: ${MAIL_FROM:no-reply@medischedule.local}
+    poll-interval-ms: 5000
+    max-attempts: 5
+    retry-delay-seconds: 15
+springdoc:
+  paths-to-match: /api/**
+  swagger-ui:
+    disable-swagger-default-url: true
+    csrf:
+      enabled: true

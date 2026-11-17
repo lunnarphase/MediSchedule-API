@@ -29,7 +29,8 @@ class AppointmentNotificationTest {
           mock(AvailabilityRepository.class),
           current,
           mock(Views.class),
-          notifications);
+          notifications,
+          mock(EmailQueueService.class));
   private Appointment appointment;
 
   @BeforeEach
