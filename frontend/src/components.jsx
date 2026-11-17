@@ -80,6 +80,12 @@ export function Icon({ name = "plus", size = 20, ...props }) {
         <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7" />
       </>
     ),
+    shield: (
+      <>
+        <path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6z" />
+        <path d="m8 12 3 3 5-6" />
+      </>
+    ),
     menu: <path d="M3 5h18M3 12h18M3 19h18" />,
   };
   return (

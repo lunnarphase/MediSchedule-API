@@ -12,6 +12,8 @@ import { DoctorAppointments } from "./features/doctor/Appointments";
 import { DoctorProfile } from "./features/doctor/Profile";
 import { Schedule } from "./features/doctor/Schedule";
 
+import { AdminDashboard } from "./features/admin/Dashboard";
+
 const patientMenu = [
   ["home", "Strona główna", "chart"],
   ["appointments", "Moje wizyty", "calendar"],
@@ -23,10 +25,11 @@ const doctorMenu = [
   ["schedule", "Mój grafik", "clock"],
   ["doctor-profile", "Profil lekarza", "users"],
 ];
+const adminMenu = [["home", "Panel administratora", "chart"]];
 const roles = { patient: "Pacjent", doctor: "Lekarz", admin: "Administrator" };
 
-function defaultRoute(role) {
-  return role === "patient" || role === "doctor" ? "home" : "profile";
+function defaultRoute() {
+  return "home";
 }
 
 function readRoute(role) {
@@ -38,9 +41,11 @@ function readRoute(role) {
       ? patientMenu.map(([key]) => key)
       : role === "doctor"
         ? doctorMenu.map(([key]) => key)
-        : []),
+        : role === "admin"
+          ? adminMenu.map(([key]) => key)
+          : []),
   ];
-  return allowed.includes(route) ? route : defaultRoute(role);
+  return allowed.includes(route) ? route : defaultRoute();
 }
 
 export default function Shell({ user, setUser, onLogout, notify, changed }) {
@@ -157,6 +162,7 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
       ? { home: <PatientDashboard />, appointments: <Appointments /> }
       : {}),
     notifications: <Notifications />,
+    ...(user.role === "admin" ? { home: <AdminDashboard /> } : {}),
     ...(user.role === "doctor"
       ? { home: <DoctorDashboard />, appointments: <DoctorAppointments /> }
       : {}),
@@ -168,7 +174,9 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
       ? patientMenu
       : user.role === "doctor"
         ? doctorMenu
-        : [];
+        : user.role === "admin"
+          ? adminMenu
+          : [];
 
   return (
     <AppContext.Provider
@@ -177,12 +185,12 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
       <div className="app-shell">
         <header className="app-header">
           <a
-            href={`#/${defaultRoute(user.role)}`}
+            href={`#/${defaultRoute()}`}
             className="brand-link"
             aria-label="MediSchedule — strona główna"
             onClick={(event) => {
               event.preventDefault();
-              navigate(defaultRoute(user.role));
+              navigate(defaultRoute());
             }}
           >
             <Brand small />
@@ -266,7 +274,7 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
           </div>
         </header>
         <main className="main-content" id="main-content" tabIndex={-1}>
-          {views[route] || views[defaultRoute(user.role)]}
+          {views[route] || views[defaultRoute()]}
         </main>
         <footer className="app-footer">
           <span>MediSchedule</span>
