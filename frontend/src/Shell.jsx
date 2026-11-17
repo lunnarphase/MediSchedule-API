@@ -15,6 +15,7 @@ import { Schedule } from "./features/doctor/Schedule";
 import { AdminDashboard } from "./features/admin/Dashboard";
 import { AdminUsers } from "./features/admin/Users";
 import { AdminAppointments } from "./features/admin/Appointments";
+import { AdminReviews, AdminReports } from "./features/admin/Moderation";
 
 const patientMenu = [
   ["home", "Strona główna", "chart"],
@@ -31,6 +32,8 @@ const adminMenu = [
   ["home", "Panel administratora", "chart"],
   ["users", "Użytkownicy", "users"],
   ["appointments", "Wizyty", "calendar"],
+  ["reviews", "Opinie", "star"],
+  ["reports", "Zgłoszenia", "bell"],
 ];
 const roles = { patient: "Pacjent", doctor: "Lekarz", admin: "Administrator" };
 
@@ -171,6 +174,8 @@ export default function Shell({ user, setUser, onLogout, notify, changed }) {
     ...(user.role === "admin" ? { home: <AdminDashboard /> } : {}),
     ...(user.role === "admin" ? { users: <AdminUsers /> } : {}),
     ...(user.role === "admin" ? { appointments: <AdminAppointments /> } : {}),
+    ...(user.role === "admin" ? { reviews: <AdminReviews /> } : {}),
+    ...(user.role === "admin" ? { reports: <AdminReports /> } : {}),
     ...(user.role === "doctor"
       ? { home: <DoctorDashboard />, appointments: <DoctorAppointments /> }
       : {}),

@@ -35,6 +35,12 @@ export function AdminDashboard() {
       "Terminy, pacjenci i statusy rezerwacji.",
       "calendar",
     ],
+    [
+      "reports",
+      "Zgłoszenia opinii",
+      "Zgłoszenia i decyzje moderacyjne.",
+      "star",
+    ],
   ];
   function refresh() {
     users.refresh();
@@ -130,6 +136,9 @@ export function AdminDashboard() {
               </div>
             )}
           </DataState>
+          <button className="text-button" onClick={() => navigate("reports")}>
+            Przejdź do zgłoszeń →
+          </button>
         </section>
       </div>
     </>

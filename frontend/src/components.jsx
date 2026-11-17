@@ -334,6 +334,9 @@ export const statusNames = {
   completed: "Zakończona",
   cancelled: "Anulowana",
   noshow: "Nieobecność",
+  pending: "Oczekujące",
+  resolved: "Rozwiązane",
+  dismissed: "Odrzucone",
 };
 export function Badge({ status, children }) {
   return (
