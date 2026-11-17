@@ -29,6 +29,12 @@ export function AdminDashboard() {
   ).length;
   const shortcuts = [
     ["users", "Użytkownicy", "Konta i uprawnienia użytkowników.", "users"],
+    [
+      "appointments",
+      "Wizyty",
+      "Terminy, pacjenci i statusy rezerwacji.",
+      "calendar",
+    ],
   ];
   function refresh() {
     users.refresh();
@@ -82,6 +88,12 @@ export function AdminDashboard() {
         <section className="card">
           <div className="section-heading">
             <h2>Dzisiejsze wizyty</h2>
+            <button
+              className="text-button"
+              onClick={() => navigate("appointments")}
+            >
+              Wszystkie wizyty →
+            </button>
           </div>
           <DataState state={appointments} empty="Brak wizyt">
             {() =>
