@@ -3638,3 +3638,26 @@ tbody tr:hover {
   height: 14px;
   margin: 0;
 }
+.email-search,
+.pagination,
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.email-search input {
+  min-width: 220px;
+}
+.pagination {
+  padding: 18px 24px;
+  justify-content: space-between;
+}
+.pagination .field {
+  margin: 0;
+  min-width: 90px;
+}
+.email-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

@@ -92,6 +92,12 @@ export function Icon({ name = "plus", size = 20, ...props }) {
       </>
     ),
     menu: <path d="M3 5h18M3 12h18M3 19h18" />,
+    mail: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 6 9 7 9-7" />
+      </>
+    ),
   };
   return (
     <svg
@@ -203,8 +209,9 @@ export function Empty({ title = "Brak danych", children, icon = "calendar" }) {
 }
 export function DataState({ state, children, empty = "Brak danych" }) {
   if (
-    state.loading &&
-    (!state.data || (Array.isArray(state.data) && !state.data.length))
+    !state.error &&
+    (state.data == null ||
+      (state.loading && Array.isArray(state.data) && !state.data.length))
   )
     return <Loading />;
   if (state.error)
