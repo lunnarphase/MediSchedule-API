@@ -149,17 +149,6 @@ export default function Auth({ onLogin, expired = false }) {
             {register ? "Zaloguj się" : "Zarejestruj się"}
           </button>
         </p>
-        <details className="demo-accounts">
-          <summary>Konta demonstracyjne</summary>
-          <dl>
-            <dt>Pacjent</dt>
-            <dd>patient@medischedule.local · Patient123!</dd>
-            <dt>Lekarz</dt>
-            <dd>doctor@medischedule.local · Doctor123!</dd>
-            <dt>Administrator</dt>
-            <dd>admin@medischedule.local · Admin123!</dd>
-          </dl>
-        </details>
         <footer className="auth-footer">
           MediSchedule · System rezerwacji wizyt medycznych
         </footer>

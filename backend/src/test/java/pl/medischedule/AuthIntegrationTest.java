@@ -28,7 +28,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-@SpringBootTest(properties = "app.demo.enabled=false")
+@SpringBootTest(properties = {"app.demo.enabled=false", "app.mail.enabled=false"})
 @AutoConfigureMockMvc
 class AuthIntegrationTest {
   @Container

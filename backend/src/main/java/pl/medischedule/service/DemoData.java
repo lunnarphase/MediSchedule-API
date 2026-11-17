@@ -3,6 +3,7 @@ package pl.medischedule.service;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,7 @@ public class DemoData implements CommandLineRunner {
   private final ReviewRepository reviews;
   private final NotificationRepository notifications;
   private final PasswordEncoder passwords;
+  private final String demoPassword;
 
   public DemoData(
       UserRepository users,
@@ -37,7 +39,8 @@ public class DemoData implements CommandLineRunner {
       AppointmentRepository appointments,
       ReviewRepository reviews,
       NotificationRepository notifications,
-      PasswordEncoder passwords) {
+      PasswordEncoder passwords,
+      @Value("${app.demo.password:}") String demoPassword) {
     this.users = users;
     this.roles = roles;
     this.patients = patients;
@@ -49,20 +52,22 @@ public class DemoData implements CommandLineRunner {
     this.reviews = reviews;
     this.notifications = notifications;
     this.passwords = passwords;
+    this.demoPassword = demoPassword;
   }
 
   @Override
   @Transactional
   public void run(String... args) {
     if (users.count() > 0) return;
-    user("admin@medischedule.local", "Admin123!", "Administrator", "admin");
+    UserService.validatePassword(demoPassword);
+    user("admin@medischedule.local", demoPassword, "Administrator", "admin");
     Patient p = new Patient();
-    p.user = user("patient@medischedule.local", "Patient123!", "Łukasz Pawlak", "patient");
+    p.user = user("patient@medischedule.local", demoPassword, "Łukasz Pawlak", "patient");
     p.pesel = "90010112345";
     p.phone = "500 600 700";
     patients.save(p);
     Patient other = new Patient();
-    other.user = user("patient2@medischedule.local", "Patient123!", "Anna Nowak", "patient");
+    other.user = user("patient2@medischedule.local", demoPassword, "Anna Nowak", "patient");
     other.pesel = "92020223456";
     other.phone = "501 602 703";
     patients.save(other);
@@ -80,7 +85,7 @@ public class DemoData implements CommandLineRunner {
       d.user =
           user(
               i == 0 ? "doctor@medischedule.local" : "doctor" + (i + 1) + "@medischedule.local",
-              "Doctor123!",
+              demoPassword,
               names[i],
               "doctor");
       d.bio = descriptions[i];

@@ -1,6 +1,5 @@
 package pl.medischedule.web;
 
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.medischedule.security.CurrentUser;
@@ -18,13 +17,13 @@ public class AdminSecurityController {
   }
 
   @GetMapping
-  public Map<String, Object> overview() {
+  public LoginProtectionService.SecurityView overview() {
     current.require("admin");
     return protection.overview();
   }
 
   @GetMapping("/attacks")
-  public Map<String, Object> details(
+  public LoginProtectionService.ActivityView details(
       @RequestParam(required = false) String email, @RequestParam(required = false) String ip) {
     current.require("admin");
     return protection.details(email, ip);

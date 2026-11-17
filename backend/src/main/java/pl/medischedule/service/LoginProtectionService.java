@@ -101,19 +101,36 @@ public class LoginProtectionService {
         && failed.stream().map(a -> a.ipAddress).filter(Objects::nonNull).distinct().count() >= 2;
   }
 
+  public record AttemptView(
+      Long id, String email, String ipAddress, Instant attemptedAt, boolean success) {
+    static AttemptView from(LoginAttempt attempt) {
+      return new AttemptView(
+          attempt.id, attempt.email, attempt.ipAddress, attempt.attemptedAt, attempt.success);
+    }
+  }
+
+  public record BlockView(String ipAddress, Instant blockedUntil, String reason) {}
+
+  public record SecurityView(List<AttemptView> attempts, List<BlockView> blockedIps) {}
+
+  public record ActivityView(List<AttemptView> attempts, long totalFailures, long distinctIps) {}
+
   @Transactional(readOnly = true)
-  public Map<String, Object> overview() {
-    List<BlockedIp> active =
+  public SecurityView overview() {
+    List<BlockView> active =
         blocks.findAll().stream()
             .filter(
                 block -> block.blockedUntil == null || block.blockedUntil.isAfter(Instant.now()))
             .sorted(Comparator.comparing(block -> block.ipAddress))
+            .map(block -> new BlockView(block.ipAddress, block.blockedUntil, block.reason))
             .toList();
-    return Map.of("attempts", attempts.findTop200ByOrderByAttemptedAtDesc(), "blockedIps", active);
+    return new SecurityView(
+        attempts.findTop200ByOrderByAttemptedAtDesc().stream().map(AttemptView::from).toList(),
+        active);
   }
 
   @Transactional(readOnly = true)
-  public Map<String, Object> details(String email, String ip) {
+  public ActivityView details(String email, String ip) {
     List<LoginAttempt> recent =
         attempts.findByAttemptedAtAfterOrderByAttemptedAtDesc(Instant.now().minusSeconds(900));
     List<LoginAttempt> matching =
@@ -121,12 +138,9 @@ public class LoginProtectionService {
             .filter(a -> email == null || email.isBlank() || email.equalsIgnoreCase(a.email))
             .filter(a -> ip == null || ip.isBlank() || ip.equals(a.ipAddress))
             .toList();
-    return Map.of(
-        "attempts",
-        matching,
-        "totalFailures",
+    return new ActivityView(
+        matching.stream().map(AttemptView::from).toList(),
         matching.stream().filter(a -> !a.success).count(),
-        "distinctIps",
         matching.stream().filter(a -> !a.success).map(a -> a.ipAddress).distinct().count());
   }
 

@@ -29,7 +29,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-@SpringBootTest(properties = "app.demo.enabled=true")
+@SpringBootTest(
+    properties = {"app.demo.enabled=true", "app.demo.password=Admin123!", "app.mail.enabled=false"})
 @AutoConfigureMockMvc
 abstract class ApiIntegrationTestSupport {
   static final PostgreSQLContainer<?> POSTGRES = database();
