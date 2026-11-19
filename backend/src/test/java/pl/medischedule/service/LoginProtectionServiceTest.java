@@ -31,6 +31,14 @@ class LoginProtectionServiceTest {
         LoginProtectionService.distributedAccountAttack(List.of(first, first, second, second)));
   }
 
+  @Test
+  void onlyPublicAddressesCanBeBlockedAsWholeIp() {
+    for (String ip : List.of("127.0.0.1", "10.0.0.1", "172.23.0.1", "192.168.1.20"))
+      assertTrue(LoginProtectionService.localNetwork(ip), ip);
+    assertFalse(LoginProtectionService.localNetwork("192.0.2.10"));
+    assertFalse(LoginProtectionService.localNetwork("203.0.113.7"));
+  }
+
   private LoginAttempt attempt(String email, String ip, boolean success, long second) {
     var attempt = new LoginAttempt();
     attempt.email = email;

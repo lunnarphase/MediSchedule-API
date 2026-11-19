@@ -1,5 +1,7 @@
 package pl.medischedule.service;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Service;
@@ -62,7 +64,9 @@ public class LoginProtectionService {
           "Wykryto rozproszone próby logowania na konto " + email + ".", "account_attack");
     List<LoginAttempt> ipFailures =
         after.stream().filter(a -> !a.success && ip.equals(a.ipAddress)).toList();
-    if (ipFailures.size() >= 6 && ipFailures.stream().map(a -> a.email).distinct().count() >= 2) {
+    if (!localNetwork(ip)
+        && ipFailures.size() >= 6
+        && ipFailures.stream().map(a -> a.email).distinct().count() >= 2) {
       boolean already =
           blocks
               .findById(ip)
@@ -79,6 +83,17 @@ public class LoginProtectionService {
             "Zablokowano adres IP " + ip + " po próbach logowania na wiele kont.",
             "global_ip_attack");
       }
+    }
+  }
+
+  // Za Nginx w Dockerze wszyscy lokalni użytkownicy mają ten sam adres bramki,
+  // więc blokada całego IP zablokowałaby logowanie każdemu, także administratorowi.
+  static boolean localNetwork(String ip) {
+    try {
+      InetAddress address = InetAddress.getByName(ip);
+      return address.isLoopbackAddress() || address.isSiteLocalAddress();
+    } catch (UnknownHostException error) {
+      return false;
     }
   }
 

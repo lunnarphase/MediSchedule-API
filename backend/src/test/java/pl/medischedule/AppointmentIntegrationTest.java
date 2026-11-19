@@ -144,6 +144,20 @@ class AppointmentIntegrationTest extends ApiIntegrationTestSupport {
                 .contentType("application/json")
                 .content("{\"status\":\"completed\"}"))
         .andExpect(status().isForbidden());
+    mvc.perform(
+            patch("/api/appointments/{id}/status", id)
+                .session(doctor)
+                .with(csrf())
+                .contentType("application/json")
+                .content("{\"status\":\"completed\"}"))
+        .andExpect(status().isConflict());
+    mvc.perform(
+            post("/api/appointments/{id}/review", id)
+                .session(patient)
+                .with(csrf())
+                .contentType("application/json")
+                .content("{\"rating\":5}"))
+        .andExpect(status().isConflict());
     complete(id);
     mvc.perform(
             patch("/api/appointments/{id}/status", id)

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { dateLabel, useData, api } from "../../api";
+import { dateLabel, useData, api, isUpcoming } from "../../api";
 import {
   Badge,
   Empty,
@@ -173,7 +173,11 @@ function StatusModal({ appointment, onClose }) {
         >
           {(finalStatus
             ? [[appointment.status, statusLabels[appointment.status]]]
-            : Object.entries(statusLabels)
+            : Object.entries(statusLabels).filter(
+                ([value]) =>
+                  !isUpcoming(appointment) ||
+                  !["completed", "noshow"].includes(value),
+              )
           ).map(([value, label]) => (
             <option key={value} value={value}>
               {label}

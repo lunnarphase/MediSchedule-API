@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import pl.medischedule.domain.*;
 import pl.medischedule.repository.*;
 import pl.medischedule.security.CurrentUser;
+import pl.medischedule.web.ApiException;
 import pl.medischedule.web.Views;
 
 class AppointmentAdminUpdateTest {
@@ -64,8 +65,21 @@ class AppointmentAdminUpdateTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"confirmed", "completed", "noshow"})
-  void leavingCancelledStatusClearsObsoleteCancellationDetails(String status) {
+  @ValueSource(strings = {"completed", "noshow"})
+  void futureAppointmentCannotBeCompletedOrMarkedAsNoShow(String status) {
+    ApiException error =
+        assertThrows(
+            ApiException.class,
+            () -> service.adminUpdate(5L, 2L, null, date, LocalTime.of(16, 0), status));
+
+    assertEquals(409, error.status);
+    assertEquals("cancelled", appointment.status);
+    verifyNoInteractions(availability);
+  }
+
+  @Test
+  void leavingCancelledStatusClearsObsoleteCancellationDetails() {
+    String status = "confirmed";
     Availability range = new Availability();
     range.date = date;
     range.startTime = LocalTime.of(16, 0);

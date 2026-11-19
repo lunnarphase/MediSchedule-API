@@ -5,16 +5,19 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import pl.medischedule.domain.*;
 import pl.medischedule.repository.*;
 import pl.medischedule.security.CurrentUser;
+import pl.medischedule.web.ApiException;
 import pl.medischedule.web.Views;
 
 class AppointmentNotificationTest {
@@ -53,6 +56,7 @@ class AppointmentNotificationTest {
     appointment.status = "confirmed";
     appointment.date = LocalDate.of(2026, 11, 8);
     appointment.time = LocalTime.of(9, 5);
+    appointment.startsAt = appointment.date.atTime(appointment.time);
     when(appointments.lockById(5L)).thenReturn(Optional.of(appointment));
   }
 
@@ -81,6 +85,20 @@ class AppointmentNotificationTest {
                 + " opinię.",
             "review_request",
             5L);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"completed", "noshow"})
+  void futureAppointmentCannotBeCompletedOrMarkedAsNoShow(String status) {
+    appointment.startsAt = LocalDateTime.now(DoctorService.ZONE).plusHours(1);
+    when(current.require("doctor")).thenReturn(appointment.doctor.user);
+
+    ApiException error =
+        assertThrows(ApiException.class, () -> service.status(5L, status, "Zalecenia"));
+
+    assertEquals(409, error.status);
+    assertEquals("confirmed", appointment.status);
+    verifyNoInteractions(notifications);
   }
 
   @Test

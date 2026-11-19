@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -197,6 +198,7 @@ abstract class ApiIntegrationTestSupport {
   }
 
   void complete(long id) throws Exception {
+    moveToYesterday(id);
     mvc.perform(
             patch("/api/appointments/{id}/status", id)
                 .session(doctor)
@@ -204,6 +206,18 @@ abstract class ApiIntegrationTestSupport {
                 .contentType("application/json")
                 .content("{\"status\":\"completed\",\"recommendations\":\"Kontrola za miesiąc.\"}"))
         .andExpect(status().isOk());
+  }
+
+  void moveToYesterday(long id) {
+    int days = (int) ChronoUnit.DAYS.between(LocalDate.now(ZoneId.of("Europe/Warsaw")), day) + 1;
+    jdbc.update(
+        "UPDATE appointments SET appointment_date = appointment_date - ?,"
+            + " starts_at = starts_at - make_interval(days => ?),"
+            + " ends_at = ends_at - make_interval(days => ?) WHERE id = ?",
+        days,
+        days,
+        days,
+        id);
   }
 
   List<Integer> race(Callable<Integer> first, Callable<Integer> second) throws Exception {

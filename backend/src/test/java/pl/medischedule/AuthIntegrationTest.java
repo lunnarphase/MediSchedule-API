@@ -7,11 +7,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -255,6 +258,35 @@ class AuthIntegrationTest {
                     json.writeValueAsString(Map.of("email", patientEmail, "password", PASSWORD))))
         .andExpect(status().isTooManyRequests());
     login(doctorEmail, PASSWORD);
+  }
+
+  @ParameterizedTest
+  @CsvSource({"172.30.0.1,200", "198.51.100.1,429"})
+  void failuresOnManyAccountsBlockOnlyPublicAddress(String network, int adminStatus)
+      throws Exception {
+    ipAddress =
+        network.substring(0, network.lastIndexOf('.') + 1) + (SERIAL.incrementAndGet() % 250 + 1);
+    for (String email : List.of(patientEmail, doctorEmail))
+      for (int attempt = 0; attempt < 3; attempt++)
+        mvc.perform(
+                post("/api/auth/login")
+                    .with(this::remoteAddress)
+                    .with(csrf())
+                    .contentType("application/json")
+                    .content(
+                        json.writeValueAsString(Map.of("email", email, "password", "Wrong123!"))))
+            .andExpect(status().isUnauthorized());
+    mvc.perform(
+            post("/api/auth/login")
+                .with(this::remoteAddress)
+                .with(csrf())
+                .contentType("application/json")
+                .content(json.writeValueAsString(Map.of("email", adminEmail, "password", PASSWORD))))
+        .andExpect(status().is(adminStatus));
+    assertThat(
+            jdbc.queryForObject(
+                "SELECT count(*) FROM blocked_ips WHERE ip_address=?", Long.class, ipAddress))
+        .isEqualTo(adminStatus == 429 ? 1L : 0L);
   }
 
   @Test

@@ -183,6 +183,7 @@ public class AppointmentService {
     if (!a.status.equals("confirmed") && !a.status.equals(status))
       throw new ApiException(409, "Zakończona lub anulowana wizyta nie może zmienić statusu.");
     boolean changed = !a.status.equals(status);
+    if (changed) requireStarted(a.startsAt, status);
     a.status = status;
     a.recommendations = recommendations;
     if (changed || !status.equals("cancelled")) {
@@ -205,6 +206,13 @@ public class AppointmentService {
     return views.appointment(a);
   }
 
+  private void requireStarted(LocalDateTime start, String status) {
+    if ((status.equals("completed") || status.equals("noshow"))
+        && start.isAfter(LocalDateTime.now(DoctorService.ZONE)))
+      throw new ApiException(
+          409, "Wizytę można zakończyć lub oznaczyć nieobecność dopiero po jej rozpoczęciu.");
+  }
+
   public Object adminUpdate(
       Long id, Long doctorId, Long patientId, LocalDate date, LocalTime time, String status) {
     current.require("admin");
@@ -221,6 +229,7 @@ public class AppointmentService {
     if (a.reviewSubmitted && (!d.id.equals(a.doctor.id) || !p.id.equals(a.patient.id)))
       throw new ApiException(409, "Nie można zmieniać uczestników ocenionej wizyty.");
     if (date == null || time == null) throw new ApiException(400, "Brak terminu.");
+    requireStarted(date.atTime(time), status);
     int duration = (int) Duration.between(a.startsAt, a.endsAt).toMinutes();
     if (!d.id.equals(a.doctor.id)) duration = d.visitDuration;
     if (!status.equals("cancelled")
