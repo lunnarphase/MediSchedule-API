@@ -116,10 +116,66 @@ backend/src/main/java/pl/medischedule/
 - **Asynchroniczne e-maile:** rezerwacja zapisuje w tej samej transakcji zadania w tabeli `email_jobs`. Po zatwierdzeniu transakcji zdarzenie uruchamia osobny wątek (`@Async`), który wysyła wiadomości przez SMTP. Dodatkowo co kilka sekund scheduler sprawdza kolejkę. Nieudane wysyłki są ponawiane z rosnącym odstępem, a awaria serwera poczty nie blokuje rezerwacji.
 - **Frontend:** komunikuje się z API przez Nginx pod tym samym adresem (`/api`).
 
-## Dokumentacja
+## REST API
 
-- **REST API:** Swagger UI pod `/swagger-ui/index.html`. Logowanie odbywa się sesją: najpierw `GET /api/auth/csrf`, potem `POST /api/auth/login`, a przed kolejnymi zapisami ponownie `GET /api/auth/csrf`.
-- **Model danych:** [docs/ERD.md](docs/ERD.md)
+API jest dostępne pod `/api` na tym samym adresie co aplikacja. Poniższe odnośniki używają domyślnego portu `8088`.
+
+- Tu można przeglądać operacje i wykonywać żądania. [Swagger UI](http://localhost:8088/swagger-ui/index.html)
+- Pełna lista operacji i ich parametrów w formacie JSON. [Specyfikacja OpenAPI](http://localhost:8088/v3/api-docs)
+
+### Logowanie i zapis w Swaggerze
+
+1. Zaloguj się w aplikacji i otwórz Swaggera w tej samej przeglądarce, pod tym samym hostem i portem. Przeglądarka prześle cookie sesji `JSESSIONID`.
+2. Rozwiń `GET /api/auth/me`, kliknij **Try it out** i **Execute**. Odpowiedź `200 OK` zawiera dane zalogowanego użytkownika.
+3. Przed pierwszym zapisem wykonaj `GET /api/auth/csrf`. Swagger pobierze wartość z cookie `XSRF-TOKEN` i wyśle ją w nagłówku `X-XSRF-TOKEN` przy operacjach zmieniających dane.
+
+Jeśli logujesz się bezpośrednio przez API, pobierz `token` z odpowiedzi `GET /api/auth/csrf`. Następnie wyślij `POST /api/auth/login` z polami `email` i `password` w JSON oraz tokenem w nagłówku `X-XSRF-TOKEN`. Pobierz nowy token po logowaniu. Klient HTTP powinien zachować ciasteczka i dołączać aktualny nagłówek CSRF przy zapisie.
+
+### Przykładowe operacje
+
+| Metoda i ścieżka | Dostęp | Działanie |
+|---|---|---|
+| `GET /api/doctors` | Zalogowany użytkownik | Wyszukuje lekarzy po nazwisku (`q`) lub specjalizacji (`specialization`). |
+| `GET /api/doctors/{id}/slots?date=YYYY-MM-DD` | Zalogowany użytkownik | Pobiera wolne godziny lekarza w wybranym dniu. |
+| `GET /api/appointments` | Zalogowany użytkownik | Pobiera wizyty widoczne dla bieżącej roli. |
+| `POST /api/appointments` | Pacjent | Rezerwuje termin. |
+| `PATCH /api/appointments/{id}/cancel` | Pacjent | Anuluje własną potwierdzoną wizytę. |
+| `PATCH /api/appointments/{id}/status` | Lekarz | Ustawia status przypisanej wizyty i zapisuje zalecenia. |
+| `PUT /api/doctor/availability` | Lekarz | Zapisuje grafik w wybranym zakresie dat. |
+| `POST /api/appointments/{id}/review` | Pacjent | Dodaje opinię po własnej zakończonej wizycie. |
+| `GET /api/notifications` | Zalogowany użytkownik | Pobiera własne powiadomienia. |
+| `GET /api/admin/users` | Administrator | Pobiera listę kont. |
+| `PATCH /api/admin/reports/{id}` | Administrator | Rozpatruje zgłoszenie opinii. |
+| `GET /api/admin/emails` | Administrator | Pobiera stronę historii wysyłki. |
+| `POST /api/admin/emails/{id}/retry` | Administrator | Zleca ponowną wysyłkę wiadomości ze statusem `failed`. |
+
+### Przykład rezerwacji
+
+Zaloguj się jako pacjent. Weź identyfikator z `GET /api/doctors` i sprawdź wolne godziny w `GET /api/doctors/{id}/slots`. Podstaw wybrany termin i identyfikator lekarza w treści JSON żądania `POST /api/appointments`.
+
+```json
+{
+  "doctorId": 1,
+  "date": "2026-12-01",
+  "time": "09:00"
+}
+```
+
+Po udanej rezerwacji API zwraca `201 Created` i dane wizyty, w tym `id`, `status` i `endTime`. Gdy termin koliduje z inną wizytą, odpowiedź ma kod `409 Conflict` i komunikat w polu `message`.
+
+```json
+{ "message": "Wybrany termin koliduje z inną wizytą." }
+```
+
+Inne typowe odpowiedzi to `400` przy nieprawidłowych danych, `401` przy braku ważnej sesji, `403` przy braku uprawnień lub błędnym tokenie CSRF i `404`, gdy zasób nie istnieje.
+
+### Paginacja historii e-maili
+
+`GET /api/admin/emails?page=0&size=5&status=sent` zwraca pierwszą stronę wysłanych wiadomości. Strony liczą się od `0`, a `size` może wynosić od `1` do `100`. Opcjonalny parametr `q` wyszukuje odbiorcę lub temat. Pozycje są w `content`, a pola `number`, `size`, `totalElements` i `totalPages` opisują stronę i pełny wynik.
+
+## Model danych
+
+[Diagram ERD](docs/ERD.md)
 
 ## Struktura repozytorium
 
