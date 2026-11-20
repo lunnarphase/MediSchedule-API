@@ -1,6 +1,11 @@
 # MediSchedule
 
 Aplikacja webowa do rezerwacji wizyt lekarskich. Pacjent wyszukuje lekarza i rezerwuje wolny termin, lekarz układa grafik i prowadzi wizyty, a administrator zarządza kontami, wizytami, opiniami i bezpieczeństwem logowania.
+
+## Demo
+
+[Pobierz nagranie demonstracyjne (MP4)](https://github.com/lunnarphase/MediSchedule-API/releases/download/demo-ztpai/demo_medischedule.mp4)
+
 ## Technologie
 
 - **Backend:** Java 21, Spring Boot 3.5 (Web, Data JPA, Security, Validation, Mail, Actuator), Flyway
