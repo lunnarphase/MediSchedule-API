@@ -188,7 +188,6 @@ Inne typowe odpowiedzi to `400` przy nieprawidłowych danych, `401` przy braku w
 backend/        aplikacja Spring Boot
 frontend/       aplikacja React i konfiguracja Nginx
 docs/           diagram ERD
-legacy/dotnet/  archiwum wcześniejszej wersji .NET (nieużywane przy uruchomieniu)
 compose.yaml    konfiguracja Docker Compose
 .env.example    przykładowa konfiguracja
 ```
